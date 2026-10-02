@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "name": "Illidari Council starts once per pull and resets on a wipe",
+  "contract": "Each council pull casts Empyreal Balance (41499) exactly once and starts one Empyreal Equivalency timer. Engaging the other members calls back into the start, so guarding the start must occur before that recursion. Native CoA melee pulls already set encounter 7 IN_PROGRESS through Unit::AtTargetAttacked engaging the controller owner and the controller inheriting BossAI::JustEngagedWith; start/wipe assertions preserve that working behavior. The remaining upstream PR 27883 changes prevent duplicate starts, guarantee a fallback aggro speaker and select death text group 5. Explicit fixtures preserve database AI bindings and register with Black Temple; the companion native extracted-callback harness checks all four initial pullers, both roll extremes, reset/re-pull and death text. This scenario counts the controller native casts by fixture GUID, avoiding packet visibility and cross-lane creatures.",
+  "timeout_ms": 30000,
+  "location": {
+    "map": 564,
+    "x": 696.6,
+    "y": 305.0,
+    "z": 277.526,
+    "o": 0,
+    "ignore_access": true
+  },
+  "players": [
+    {
+      "id": "raider",
+      "race": 1,
+      "class": 8,
+      "level": 60,
+      "melee_hit_rating": 10000,
+      "expertise_rating": 10000
+    }
+  ],
+  "creatures": [
+    {
+      "id": "controller",
+      "owner": "raider",
+      "entry": 23426,
+      "distance": 0,
+      "health": 1000000
+    },
+    {
+      "id": "gathios",
+      "owner": "raider",
+      "entry": 22949,
+      "distance": 2,
+      "health": 1000000
+    },
+    {
+      "id": "zerevor",
+      "owner": "raider",
+      "entry": 22950,
+      "distance": 3,
+      "health": 1000000
+    },
+    {
+      "id": "malande",
+      "owner": "raider",
+      "entry": 22951,
+      "distance": 4,
+      "health": 1000000
+    },
+    {
+      "id": "veras",
+      "owner": "raider",
+      "entry": 22952,
+      "distance": 5,
+      "health": 1000000
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "The fixture entered Black Temple",
+      "actor": "raider",
+      "metric": "map_id",
+      "equals": 564
+    },
+    {
+      "action": "assert",
+      "label": "The controller initialized an idle encounter",
+      "actor": "raider",
+      "metric": "instance_boss_state",
+      "id": 7,
+      "equals": 0
+    },
+    {
+      "action": "snapshot",
+      "label": "Record actual controller balance casts before the pull",
+      "actor": "controller",
+      "metric": "spell_cast_count",
+      "spell": 41499,
+      "save_as": "balance_before_pull"
+    },
+    {
+      "action": "attack",
+      "label": "Pull the explicitly registered Gathios fixture through native melee",
+      "actor": "raider",
+      "target": "gathios"
+    },
+    {
+      "action": "assert",
+      "label": "Native engagement starts the council before any death",
+      "actor": "raider",
+      "metric": "instance_boss_state",
+      "id": 7,
+      "equals": 1,
+      "within_ms": 1500
+    },
+    {
+      "action": "assert",
+      "label": "DISCRIMINATING: Recursive member engagement casts Empyreal Balance exactly once",
+      "actor": "controller",
+      "metric": "spell_cast_count",
+      "spell": 41499,
+      "relative_to": "balance_before_pull",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "gathios remains alive during the pull",
+      "actor": "gathios",
+      "metric": "alive",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "zerevor remains alive during the pull",
+      "actor": "zerevor",
+      "metric": "alive",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "malande remains alive during the pull",
+      "actor": "malande",
+      "metric": "alive",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "veras remains alive during the pull",
+      "actor": "veras",
+      "metric": "alive",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "gathios enters combat through the controller",
+      "actor": "gathios",
+      "metric": "combat",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "zerevor enters combat through the controller",
+      "actor": "zerevor",
+      "metric": "combat",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "malande enters combat through the controller",
+      "actor": "malande",
+      "metric": "combat",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "veras enters combat through the controller",
+      "actor": "veras",
+      "metric": "combat",
+      "equals": 1
+    },
+    {
+      "action": "die",
+      "actor": "raider"
+    },
+    {
+      "action": "assert",
+      "label": "Losing the only living player resets the encounter through native evade",
+      "actor": "raider",
+      "metric": "instance_boss_state",
+      "id": 7,
+      "equals": 0,
+      "within_ms": 8000
+    },
+    {
+      "action": "assert",
+      "label": "gathios leaves combat after the wipe",
+      "actor": "gathios",
+      "metric": "combat",
+      "equals": 0,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "zerevor leaves combat after the wipe",
+      "actor": "zerevor",
+      "metric": "combat",
+      "equals": 0,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "malande leaves combat after the wipe",
+      "actor": "malande",
+      "metric": "combat",
+      "equals": 0,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "veras leaves combat after the wipe",
+      "actor": "veras",
+      "metric": "combat",
+      "equals": 0,
+      "within_ms": 3000
+    }
+  ]
+}
