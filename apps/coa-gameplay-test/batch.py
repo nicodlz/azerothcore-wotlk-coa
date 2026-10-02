@@ -945,7 +945,9 @@ class Batch:
         if self.binary_changed:
             self.fail(f'{name} were skipped: the worldserver binary changed during the batch')
             return
-        slots = [slot for slot in range(self.args.jobs) if slot not in self.unusable_slots][:len(cases)]
+        start = self.args.world_cache_slot_start
+        slots = [slot for slot in range(start, start + self.args.jobs)
+                 if slot not in self.unusable_slots][:len(cases)]
         if not slots:
             self.fail(f'{name} were skipped: every world-cache slot is still leased by a running server')
             return
@@ -1086,7 +1088,7 @@ class Batch:
         result = {
             'schema': 1, 'status': status, 'scope': self.scope(keys),
             'selected': keys, 'exploratory': list(exploratory), 'jobs': self.args.jobs,
-            'clock': self.args.clock, 'lanes': self.lanes,
+            'clock': self.args.clock, 'lanes': self.lanes, 'cache_slot_start': self.args.world_cache_slot_start,
             'binary': str(self.binary), 'binary_sha256': self.binary_sha256,
             'counts': {'passed': outcomes.count('passed'), 'failed': outcomes.count('failed'),
                        'not_run': outcomes.count('not_run'),
@@ -1133,7 +1135,8 @@ class Batch:
                 self.staged = run.stage_modules(self.module_source, self.module_target, run.reserved_settings())
                 try:
                     self.module_hashes = {path.name: run.sha256(path) for path in self.staged}
-                    self.run_threads(self.work, range(min(self.args.jobs, self.queued)))
+                    start = self.args.world_cache_slot_start
+                    self.run_threads(self.work, range(start, start + min(self.args.jobs, self.queued)))
                     if not self.interrupted():
                         self.run_singles()
                     self.interrupted()
@@ -1234,6 +1237,8 @@ def parser():
     mode = result.add_mutually_exclusive_group()
     mode.add_argument('--fresh-databases', action='store_true', help='Use disposable copies without the world cache')
     mode.add_argument('--refresh-world', action='store_true', help='Replace each slot world cache on first use')
+    result.add_argument('--world-cache-slot-start', type=int, default=0,
+                        help='First world-cache slot index; subsequent workers use consecutive slots (default 0)')
     result.add_argument('--world-cache-root', type=Path, default=CACHE_ROOT,
                         help='Parent directory of the per-worker world-cache slots')
     return result
@@ -1244,6 +1249,7 @@ def main(argv=None, directory=catalog.DIRECTORY):
     previous_handlers = {}
     try:
         run.require(args.jobs >= 1, '--jobs must be at least 1')
+        run.require(args.world_cache_slot_start >= 0, '--world-cache-slot-start must be nonnegative')
         run.require(math.isfinite(args.startup_timeout) and args.startup_timeout > 0, 'Invalid startup timeout')
         run.require(args.server_modules_dir or os.name == 'nt',
                     '--server-modules-dir is required outside Windows (the worldserver reads CONF_DIR/modules)')

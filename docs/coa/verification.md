@@ -52,6 +52,7 @@ Keep secrets out of this file: credentials stay in the worldserver config or the
 | `mysql_server_bin` | none; a MySQL `bin` directory holding both `mysql` and `mysqld`, for `--mysql-bin` |
 | `jobs` | the CPU count |
 | `gameplay_jobs` | `max(1, min(4, cpu // 3))`; used only with `--gameplay-clock real` |
+| `gameplay_cache_slot_start` | `0`; first world-cache slot index (nonnegative integer) |
 | `gameplay_db_workers` | `16` (1-32); character database workers, used only with the simulated clock |
 
 `cmake_args` is used only to configure a build directory that has no `CMakeCache.txt` or whose last configure
@@ -158,6 +159,8 @@ disable the others, so pair it with `--stages`; a filter for a stage that is not
 - `--base REF`: the source stage compares with `REF` instead of `HEAD` and runs only the suites that diff
   selects; see [Source comparison base](#source-comparison-base).
 
+- `--gameplay-cache-slot-start N`: use consecutive world-cache slots beginning at `N` instead of zero.
+  The settings key `gameplay_cache_slot_start` supplies the default; an explicit CLI zero overrides it.
 - `--fresh-databases` or `--refresh-world`: the gameplay stage uses disposable database copies instead of the
   world-cache slots, or replaces each slot's world copy on first use.
 - `--gameplay-clock simulated|real` (default `simulated`), `--gameplay-lanes N` (1-15, default 15, simulated
@@ -506,8 +509,10 @@ a fresh server. Report `isolated_only` ids as well: they passed only in isolatio
 
 ### World-cache slots
 
-Worker `k` (only worker 0 on the simulated clock) uses the world cache at
-`.cache/coa-gameplay-tests/world-cache/slots/slot-<k>`, separate from the single-run cache in
+With `--gameplay-cache-slot-start N` (default zero), worker `k` uses the world cache at
+`.cache/coa-gameplay-tests/world-cache/slots/slot-<N+k>`. The simulated clock uses only slot `N`;
+restarts, real-pace cases and isolated reruns keep their worker slot. `batch.py` accepts the matching
+`--world-cache-slot-start N` option. These caches are separate from the single-run cache in
 `.cache/coa-gameplay-tests/world-cache/`. Each slot has its own lease and retains its own
 `coa_test_<cache-id>_world` copy, so the first run of a new slot copies the world database and every extra
 gameplay job keeps another copy in MySQL. Reuse and invalidation follow the single-run rules in the

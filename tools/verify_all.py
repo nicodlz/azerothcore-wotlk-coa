@@ -44,7 +44,7 @@ PATH_SETTINGS = ('build_directory', 'worldserver', 'worldserver_config', 'mysql'
                  'database_client_config', 'server_modules_dir', 'modules_config_dir', 'dbc_directory',
                  'workspace_tools', 'datamine_directory', 'mysql_server_bin')
 COUNT_SETTINGS = ('jobs', 'gameplay_jobs', 'gameplay_db_workers')
-SETTING_KEYS = frozenset((*PATH_SETTINGS, *COUNT_SETTINGS, 'cmake_args'))
+SETTING_KEYS = frozenset((*PATH_SETTINGS, *COUNT_SETTINGS, 'cmake_args', 'gameplay_cache_slot_start'))
 CONFIGURED_DIRECTORIES = ('dbc_directory', 'datamine_directory', 'workspace_tools', 'mysql_server_bin')
 PROGRAM_SETTINGS = ('mysql', 'mysqldump')
 MYSQL_CLIENT_DIRECTORIES = (Path('/opt/homebrew/opt/mysql-client/bin'), Path('/usr/local/opt/mysql-client/bin'))
@@ -115,6 +115,7 @@ class Context:
     environment: dict
     world_databases: str | None = None
     gameplay_db_workers: int = 1
+    gameplay_cache_slot_start: int = 0
 
 
 def absolute(value, base):
@@ -151,6 +152,9 @@ def load_settings(path, explicit):
     for key in COUNT_SETTINGS:
         if key in data and not (type(data[key]) is int and data[key] > 0):
             raise ValueError(f'Setting {key} must be a positive integer')
+    slot = data.get('gameplay_cache_slot_start', 0)
+    if type(slot) is not int or slot < 0:
+        raise ValueError('Setting gameplay_cache_slot_start must be a nonnegative integer')
     if data.get('gameplay_db_workers', 1) > MAXIMUM_GAMEPLAY_DB_WORKERS:
         raise ValueError(f'Setting gameplay_db_workers must be at most {MAXIMUM_GAMEPLAY_DB_WORKERS}')
     arguments = data.get('cmake_args', [])
@@ -931,7 +935,8 @@ def gameplay_command(context):
                       ('database_client_config', '--database-client-config')):
         if settings.get(key):
             command += [flag, settings[key]]
-    command += ['--output', context.output / 'gameplay', '--jobs', context.gameplay_jobs]
+    command += ['--output', context.output / 'gameplay', '--jobs', context.gameplay_jobs,
+                '--world-cache-slot-start', context.gameplay_cache_slot_start]
     if context.gameplay_clock == SIMULATED_CLOCK:
         command += ['--clock', SIMULATED_CLOCK, '--lanes', context.gameplay_lanes,
                     '--character-db-workers', context.gameplay_db_workers]
@@ -1152,6 +1157,7 @@ def stage_plan(name, context):
             plan['commands'] = [gameplay_command(planned)]
         plan['scenarios'] = scenario_plan(context)
         plan['gameplay_jobs'] = context.gameplay_jobs
+        plan['cache_slot_start'] = context.gameplay_cache_slot_start
         plan['clock'] = context.gameplay_clock
         plan['lanes'] = context.gameplay_lanes
         plan['db_workers'] = context.gameplay_db_workers
@@ -1180,6 +1186,13 @@ def positive_integer(value):
     number = int(value)
     if number <= 0:
         raise argparse.ArgumentTypeError('must be a positive integer')
+    return number
+
+
+def nonnegative_integer(value):
+    number = int(value)
+    if number < 0:
+        raise argparse.ArgumentTypeError('must be a nonnegative integer')
     return number
 
 
@@ -1218,6 +1231,8 @@ def parser():
     result.add_argument('--gameplay-lanes', type=lane_count,
                         help=f'Concurrent cases in the simulated-clock worldserver (default: {DEFAULT_GAMEPLAY_LANES})')
     result.add_argument('--gameplay-jobs', type=positive_integer, help='Concurrent real-clock gameplay worldservers')
+    result.add_argument('--gameplay-cache-slot-start', type=nonnegative_integer,
+                        help='First gameplay world-cache slot index (default: settings gameplay_cache_slot_start or 0)')
     result.add_argument('--gameplay-db-workers', type=database_worker_count,
                         help='Asynchronous character database workers of the simulated-clock worldserver '
                              f'(default: settings gameplay_db_workers or {DEFAULT_GAMEPLAY_DB_WORKERS}; the real clock '
@@ -1314,7 +1329,9 @@ def prepare(args, root, environment):
     scenarios = resolve_scenarios(args) if 'gameplay' in stages else []
     context = Context(root, raw, settings, output, stages, jobs, gameplay_jobs, args.gameplay_clock, gameplay_lanes,
                       args.base, scenarios, harness, environment, args.world_databases,
-                      gameplay_db_workers(args, raw))
+                      gameplay_db_workers(args, raw),
+                      args.gameplay_cache_slot_start if args.gameplay_cache_slot_start is not None
+                      else raw.get('gameplay_cache_slot_start', 0))
     check_command_length(context)
     if not args.plan:
         context.output = claim_output(requested, root)
