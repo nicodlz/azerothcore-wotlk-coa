@@ -75,7 +75,7 @@ METRICS = {
     'gossip_text',
     'stat', 'attack_power', 'ranged_attack_power', 'armor', 'weapon_damage_min', 'resistance',
     'attack_time_ms', 'pet_attack_time_ms', 'run_speed_rate', 'display_id',
-    'session_player_limit', 'configured_player_limit',
+    'session_player_limit', 'session_player_limit_config_difference',
     'aura_amplitude_ms', 'melee_crit_chance', 'dodge_chance', 'parry_chance', 'expertise', 'combat_rating',
     'spell_modifier', 'spell_cast_time_ms', 'spell_max_range', 'spell_max_stacks', 'spell_healing_done',
     'aura_crit_chance', 'aura_script_value', 'melee_hit_chance', 'spell_hit_chance', 'spell_power',

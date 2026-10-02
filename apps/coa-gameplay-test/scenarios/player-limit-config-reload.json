@@ -18,16 +18,9 @@
   ],
   "steps": [
     {
-      "action": "snapshot",
-      "actor": "player",
-      "metric": "configured_player_limit",
-      "save_as": "configured_limit"
-    },
-    {
       "action": "assert",
       "actor": "player",
-      "metric": "session_player_limit",
-      "relative_to": "configured_limit",
+      "metric": "session_player_limit_config_difference",
       "equals": 0
     },
     {
@@ -48,8 +41,7 @@
     {
       "action": "assert",
       "actor": "player",
-      "metric": "session_player_limit",
-      "relative_to": "configured_limit",
+      "metric": "session_player_limit_config_difference",
       "equals": 0
     },
     {
@@ -82,8 +74,7 @@
     {
       "action": "assert",
       "actor": "player",
-      "metric": "session_player_limit",
-      "relative_to": "configured_limit",
+      "metric": "session_player_limit_config_difference",
       "equals": 0
     },
     {
@@ -116,8 +107,7 @@
     {
       "action": "assert",
       "actor": "player",
-      "metric": "session_player_limit",
-      "relative_to": "configured_limit",
+      "metric": "session_player_limit_config_difference",
       "equals": 0
     },
     {
@@ -150,8 +140,7 @@
     {
       "action": "assert",
       "actor": "player",
-      "metric": "session_player_limit",
-      "relative_to": "configured_limit",
+      "metric": "session_player_limit_config_difference",
       "equals": 0
     },
     {

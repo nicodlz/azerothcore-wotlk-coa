@@ -1694,8 +1694,9 @@ private:
         }
         if (metric == "session_player_limit")
             return sWorldSessionMgr->GetPlayerAmountLimit();
-        if (metric == "configured_player_limit")
-            return sConfigMgr->GetOption<uint32>("PlayerLimit", 1000);
+        if (metric == "session_player_limit_config_difference")
+            return double(sWorldSessionMgr->GetPlayerAmountLimit()) -
+                double(sConfigMgr->GetOption<uint32>("PlayerLimit", 1000));
         if (metric == "run_speed_rate")
             return unit->GetSpeedRate(MOVE_RUN);
         if (metric == "spell_hit_bonus_taken")
