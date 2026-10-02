@@ -12,6 +12,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include <algorithm>
+#include <iterator>
 namespace
 {
 using namespace AscensionPyromancer;
@@ -175,7 +176,8 @@ class pyromancer_spells : public AllSpellScript
             else
                 Cast(player, player, 803712);
         }
-        if (Named(info, 802174))
+        if (std::find(std::begin(PyromancerEchoRanks), std::end(PyromancerEchoRanks), id) !=
+            std::end(PyromancerEchoRanks))
         {
             uint32 const extra = player->HasAura(704814) ? uint32(std::max(0, Amount(704814))) : 0;
             for (auto const& pair : player->GetSpellMap())
