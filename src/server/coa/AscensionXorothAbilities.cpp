@@ -16,6 +16,7 @@
 namespace
 {
 using namespace AscensionXoroth;
+constexpr uint32 SPELL_FLAMES_OF_XOROTH_VISUAL = 801003;
 constexpr uint32 selected[] = {680197, 680203, 681184, 520021, 802617, 802618, 524913, 680729, 712294};
 bool Select(SpellInfo const* info, uint32 id)
 {
@@ -57,6 +58,14 @@ bool RefundableMiss(Player* player, Spell* spell)
                     refundable = false;
             }
     return hostile && refundable;
+}
+bool SilencedByHit(Unit* target)
+{
+    for (uint32 type = CURRENT_MELEE_SPELL; type < CURRENT_MAX_SPELL; ++type)
+        if (Spell* current = target->GetCurrentSpell(CurrentSpellTypes(type)))
+            if (current->GetSpellInfo()->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
+                return true;
+    return false;
 }
 void RecordBellowsResult(Player* player, SpellInfo const* info, Unit* target, uint8 miss)
 {
@@ -122,6 +131,28 @@ void ConsumeSelected(Player* player, Spell* spell)
                     aura->Remove();
             }
 }
+bool Flayable(Unit* unit)
+{
+    Creature* corpse = unit ? unit->ToCreature() : nullptr;
+    return corpse && corpse->getDeathState() == DeathState::Corpse &&
+           (corpse->GetCreatureType() == CREATURE_TYPE_HUMANOID || corpse->GetCreatureType() == CREATURE_TYPE_BEAST ||
+            corpse->GetCreatureType() == CREATURE_TYPE_DEMON);
+}
+float FlayRange(Player* player, Spell* spell)
+{
+    return std::max(spell->GetSpellInfo()->GetMaxRange(false, player, spell), INTERACTION_DISTANCE);
+}
+Creature* NearestFlayable(Player* player, float range)
+{
+    std::list<Creature*> corpses;
+    player->GetDeadCreatureListInGrid(corpses, range, true);
+    Creature* nearest = nullptr;
+    for (Creature* corpse : corpses)
+        if (Flayable(corpse) && player->IsWithinLOSInMap(corpse) &&
+            (!nearest || player->GetExactDistSq(corpse) < player->GetExactDistSq(nearest)))
+            nearest = corpse;
+    return nearest;
+}
 class xoroth_casts : public AllSpellScript
 {
   public:
@@ -130,7 +161,7 @@ class xoroth_casts : public AllSpellScript
                          {ALLSPELLHOOK_ON_SPELL_CHECK_CAST, ALLSPELLHOOK_ON_BEFORE_EFFECTS, ALLSPELLHOOK_ON_CAST,
                           ALLSPELLHOOK_ON_CALCULATED_TARGET, ALLSPELLHOOK_ON_HIT_RESULT,
                           ALLSPELLHOOK_ON_CALC_MAX_DURATION, ALLSPELLHOOK_ON_CRIT_CHANCE,
-                          ALLSPELLHOOK_ON_SUCCESSFUL_INTERRUPT, ALLSPELLHOOK_ON_INTERRUPT_DURATION})
+                          ALLSPELLHOOK_ON_INTERRUPT_DURATION})
     {
     }
     void OnSpellCheckCast(Spell* spell, bool, SpellCastResult& result) override
@@ -147,14 +178,12 @@ class xoroth_casts : public AllSpellScript
             result = SPELL_FAILED_CASTER_AURASTATE;
         if (info->Id == 801042)
         {
-            Unit* unit = spell->m_targets.GetUnitTarget();
-            Creature* corpse = unit ? unit->ToCreature() : nullptr;
+            if (!Flayable(spell->m_targets.GetUnitTarget()))
+                if (Creature* corpse = NearestFlayable(player, FlayRange(player, spell)))
+                    spell->m_targets.SetUnitTarget(corpse);
             if (player->IsInCombat())
                 result = SPELL_FAILED_AFFECTING_COMBAT;
-            else if (!corpse || corpse->getDeathState() != DeathState::Corpse ||
-                     (corpse->GetCreatureType() != CREATURE_TYPE_HUMANOID &&
-                      corpse->GetCreatureType() != CREATURE_TYPE_BEAST &&
-                      corpse->GetCreatureType() != CREATURE_TYPE_DEMON))
+            else if (!Flayable(spell->m_targets.GetUnitTarget()))
                 result = SPELL_FAILED_BAD_TARGETS;
         }
     }
@@ -164,8 +193,8 @@ class xoroth_casts : public AllSpellScript
         if (!player)
             return;
         uint32 fire = State(player).fire, id = aura->GetId();
-        if (id == 801064)
-            duration = 3000 * fire;
+        if (id == 801064 || id == 801063)
+            duration = Amount(500906, EFFECT_2, player) * int32(fire);
         if (id == 801017)
             duration *= 1 + fire;
         if (id == 803889)
@@ -174,6 +203,8 @@ class xoroth_casts : public AllSpellScript
             duration = int32(duration * (1 + Amount(704964, 1) / 100.0f));
         if (id == 801052)
             duration = int32(duration * State(player).unleash);
+        if (player->HasAura(704980) && Mark(aura->GetSpellInfo()))
+            duration = int32(duration * (1 + Amount(704980, 1) / 100.0f));
     }
     void OnSpellBeforeEffects(Spell* spell, Unit* caster, SpellInfo const* info) override
     {
@@ -212,17 +243,27 @@ class xoroth_casts : public AllSpellScript
     }
     void OnSpellCritChance(Spell* spell, Unit*, float& chance) override
     {
-        if (!Owner(spell->GetCaster()))
+        Player* player = Owner(spell->GetCaster());
+        if (!player)
             return;
         if (spell->GetScriptValue(524913) || spell->GetScriptValue(802618))
             chance = 100;
+        if (Spender(spell->GetSpellInfo()) && player->HasAura(705000))
+            chance = std::min(100.0f, chance + Amount(705000));
     }
     void OnSpellCalculatedTarget(Spell* spell, Unit* target, TargetInfo& result) override
     {
         Player* player = Owner(spell->GetCaster());
-        if (!player || result.damage <= 0 || !target)
+        if (!player || !target)
             return;
         auto info = spell->GetSpellInfo();
+        if (Named(info, 800081) && !spell->GetScriptValue(800835) && SilencedByHit(target))
+        {
+            spell->SetScriptValue(800835, 1);
+            Reduce(player, 800081, int32(info->RecoveryTime * Amount(800835) / 100));
+        }
+        if (result.damage <= 0)
+            return;
         uint32 fire = uint32(spell->GetScriptValue(500906));
         float factor = 1;
         if (Named(info, 800168))
@@ -249,14 +290,6 @@ class xoroth_casts : public AllSpellScript
     {
         if (Player* player = Owner(spell->GetCaster()); player && spell->GetSpellInfo()->Id == 802857)
             duration = int32(duration * State(player).unleash);
-    }
-    void OnSpellSuccessfulInterrupt(Spell* spell, Unit*) override
-    {
-        Player* player = Owner(spell->GetCaster());
-        if (!player || !Named(spell->GetSpellInfo(), 800081) || spell->GetScriptValue(800835))
-            return;
-        spell->SetScriptValue(800835, 1);
-        Reduce(player, 800081, int32(spell->GetSpellInfo()->RecoveryTime * Amount(800835) / 100));
     }
     void OnSpellHitResult(Spell* spell, Unit* target, uint8 miss, uint32 damage, uint32, bool critical) override
     {
@@ -413,6 +446,8 @@ class xoroth_casts : public AllSpellScript
             }
             if (id == 520292)
                 Reduce(player, id, 3000 * fire);
+            if (Named(info, 801059))
+                Cast(player, player, SPELL_FLAMES_OF_XOROTH_VISUAL);
             if (id == 802342)
                 Cast(player, player, 801017);
             if (id == 805679)
@@ -423,7 +458,7 @@ class xoroth_casts : public AllSpellScript
                         (summon->GetEntry() == 50301 || summon->GetEntry() == 50375))
                         player->AddAura(id, summon);
             if (id == 807247)
-                Cast(player, player, 807248);
+                player->AddAura(807248, player);
             if (id == 801061)
                 for (Unit* ally : Nearby(player, 20))
                     if (ally == player || player->IsInRaidWith(ally))
@@ -438,6 +473,8 @@ class xoroth_casts : public AllSpellScript
             {
                 if (player->HasAura(SPELL_WARPATH))
                     Cast(player, player, SPELL_WARPATH_PROTECTION);
+                if (player->HasAura(680216))
+                    player->RemoveMovementImpairingAuras(true);
                 Unleash(player, player);
                 if (player->HasAura(704961))
                     if (Pet* pet = player->GetPet(); pet && pet->GetEntry() == 510100)
@@ -453,8 +490,8 @@ class xoroth_casts : public AllSpellScript
                     Cast(player, pet, id == 801053 ? 802605 : id == 802344 ? 802603 : id == 804786 ? 806962 : 802604);
                     State(player).timers.ScheduleEvent(300398, 10s);
                 }
-            if (Infernal(info) && player->HasAura(707666))
-                Summon(player, 50301, player->GetNearPosition(2, 0),
+            if (Infernal(info) && player->HasAura(706755))
+                Summon(player, 50301, ImpPosition(player),
                        uint32(sSpellMgr->GetSpellInfo(807699)->GetDuration()));
             if (Named(info, 801059) && fire == 6 && player->HasAura(704452))
                 Cast(player, player, 801006);
@@ -541,12 +578,16 @@ class spell_ascension_xoroth_ability : public SpellScript
         if (summoned)
             return;
         summoned = true;
-        Position position = GetExplTargetDest() ? GetExplTargetDest()->GetPosition() : player->GetNearPosition(2, 0);
         uint32 entry = id == 704247 ? 50375 : id == 706756 ? 51323 : id == 804774 ? 50268 : 50301;
+        WorldLocation const* destination = GetExplTargetDest();
         uint32 count = id == 524897 ? 1 + uint32(GetSpell()->GetScriptValue(500906)) : std::max(1, GetEffectValue());
         uint32 duration = std::max(1000, GetSpellInfo()->GetDuration());
         for (uint32 n = 0; n < std::min(12u, count); ++n)
-            Summon(player, entry, position, duration);
+            Summon(player, entry,
+                   destination        ? destination->GetPosition()
+                   : entry == 50301   ? ImpPosition(player)
+                                      : player->GetNearPosition(2, 0),
+                   duration);
     }
     void Register() override
     {

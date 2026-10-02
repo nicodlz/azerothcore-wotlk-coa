@@ -22,12 +22,14 @@ MECHANICS = 'apps/coa-mechanics/'
 COA = 'src/server/coa/'
 COA_TESTS = 'apps/coa-tests/'
 NATIVE_DBC = 'src/server/shared/DataStores/'
+CONTENT = 'apps/coa-world-content/'
 CONTROL_FILES = {'tools/check_source.py', 'tools/test_source.py', '.github/workflows/quality.yml'}
 SUITES = {
     'source-tools': {
-        'paths': ['tools/check_*.py', 'tools/test_*.py', 'tools/comment_policy.py'],
+        'paths': ['tools/check_*.py', 'tools/test_*.py', 'tools/comment_policy.py', 'tools/verify_*.py',
+                  GAMEPLAY + 'batch.py', GAMEPLAY + 'catalog.py', GAMEPLAY + 'run.py'],
         'commands': [['tools/test_source.py'], ['tools/test_change_boundaries.py'], ['tools/test_registrations.py'],
-                     ['tools/test_comments.py']],
+                     ['tools/test_comments.py'], ['tools/test_verify_all.py']],
     },
     'codestyle': {
         'paths': ['apps/codestyle/*', '.editorconfig'],
@@ -50,7 +52,12 @@ SUITES = {
     'gameplay': {
         'paths': [GAMEPLAY + '*.py', GAMEPLAY + '*.json', COA + 'CoAGameplayTest*'],
         'commands': [[GAMEPLAY + 'test_runner.py'], [GAMEPLAY + 'test_world_cache.py'],
-                     [GAMEPLAY + 'test_verification.py'], [GAMEPLAY + 'catalog.py', '--check']],
+                     [GAMEPLAY + 'test_verification.py'], [GAMEPLAY + 'test_batch.py'],
+                     [GAMEPLAY + 'catalog.py', '--check']],
+    },
+    'world-content': {
+        'paths': [CONTENT + '*.py'],
+        'commands': [[CONTENT + 'test_validate_content.py'], [CONTENT + 'test_archive.py']],
     },
     'registrations': {
         'paths': [COA + '*.cpp', COA + '*.h', COA + 'CMakeLists.txt', 'src/server/apps/worldserver/Main.cpp',

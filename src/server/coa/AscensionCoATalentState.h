@@ -15,6 +15,9 @@ struct KnownEntry
 {
     std::uint32_t EntryId;
     std::uint32_t Rank;
+    std::uint32_t LearnedSpellRank = 0;
+    bool Locked = false;
+    std::uint32_t LearnOrder = 0;
 };
 
 std::uint32_t KnownRank(AscensionCompatData::CoATalentEntry const& entry, HasSpell const& hasSpell);
@@ -32,6 +35,17 @@ SpentPoints Spent(std::vector<KnownEntry> const& known);
 std::vector<std::uint8_t> KnownEntriesPayload(std::vector<KnownEntry> const& known);
 
 bool ParseKnownEntriesUpload(std::uint8_t const* data, std::size_t size, std::vector<KnownEntry>& known);
+
+struct UploadedSpecialization
+{
+    std::uint32_t SpecId = 0;
+    bool Mixed = false;
+    bool ChoosesTalents = false;
+};
+
+UploadedSpecialization SpecializationOf(std::vector<KnownEntry> const& upload);
+
+std::vector<KnownEntry> SpecializationSwitch(std::uint8_t classId, HasSpell const& hasSpell, std::uint32_t specId);
 }
 
 #endif

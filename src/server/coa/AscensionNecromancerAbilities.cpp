@@ -64,6 +64,11 @@ void Virulency(Player* player, Unit* target)
                         effect->SetPeriodicTimer(saved.timers[index]);
                     }
             }
+        if (Aura* infestation = player->GetAura(803782); infestation && infestation->GetCharges())
+        {
+            infestation->SetCharges(infestation->GetCharges() - 1);
+            return;
+        }
         state.diseases.clear();
         player->RemoveAurasDueToSpell(803782);
         player->SetTemporarySpellReplacement(801938, 0);
@@ -137,7 +142,8 @@ class necromancer_casts : public AllSpellScript
             result = SPELL_FAILED_CASTER_AURASTATE;
         if (Cost(player, id) && int32(Capacity(player)) - Used(player) < Cost(player, id))
             result = SPELL_FAILED_ALREADY_HAVE_SUMMON;
-        if (Command(info) && (player->HasAura(500983) || Minions(player).empty()))
+        if (Command(info) && (player->HasAura(500983) ||
+            (!Named(info, 504868) && Minions(player).empty())))
             result = SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         if ((id == 500443 || id == 801938) && !player->HasAura(803782) && !Diseases(player, target))
             result = SPELL_FAILED_TARGET_AURASTATE;
@@ -258,8 +264,9 @@ class necromancer_casts : public AllSpellScript
                 for (auto const& [known, value] : player->GetSpellMap())
                     if (value->State != PLAYERSPELL_REMOVED)
                         if (SpellInfo const* summon = sSpellMgr->GetSpellInfo(known))
-                            if (summon->SpellFamilyName == 29 && summon->HasEffect(SPELL_EFFECT_SUMMON) &&
-                                !Raised(summon))
+                            if (summon->SpellFamilyName == 29 &&
+                                ((summon->HasEffect(SPELL_EFFECT_SUMMON) && !Raised(summon)) ||
+                                 Named(summon, 805040) || Named(summon, 504315)))
                                 animates.push_back(known);
                 for (uint32 animate : animates)
                     player->ModifySpellCooldown(animate, -std::abs(Amount(302910, 1)));
@@ -366,7 +373,7 @@ class spell_ascension_necromancer_ability : public SpellScript
                 int32 heal = Amount(id, 0, player);
                 if (player->HasAura(704684))
                     heal = player->CountPctFromMaxHealth(Amount(704684));
-                minion->DespawnOrUnsummon();
+                minion->KillSelf();
                 Copy(player, player, 805031, std::max(1, heal), 1);
             }
             Sync(player);
@@ -432,9 +439,26 @@ class spell_ascension_necromancer_ability : public SpellScript
             }
     }
 };
+
+class spell_ascension_necromancer_transfer_life : public SpellScript
+{
+    PrepareSpellScript(spell_ascension_necromancer_transfer_life);
+    void Filter(std::list<WorldObject*>& targets)
+    {
+        Player* player = Owner(GetCaster());
+        targets.remove_if([player](WorldObject* object)
+                          { return !player || !object->ToUnit() || !IsMinion(player, object->ToUnit(), true); });
+    }
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ascension_necromancer_transfer_life::Filter,
+                                                                  EFFECT_ALL, TARGET_UNIT_SRC_AREA_ALLY);
+    }
+};
 }
 void AddAscensionNecromancerAbilityScripts()
 {
     new necromancer_casts();
     RegisterSpellScript(spell_ascension_necromancer_ability);
+    RegisterSpellScript(spell_ascension_necromancer_transfer_life);
 }

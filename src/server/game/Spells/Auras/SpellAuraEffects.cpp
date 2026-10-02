@@ -1210,6 +1210,10 @@ bool AuraEffect::IsAffectedOnSpell(SpellInfo const* spell) const
     if (!spell)
         return false;
 
+    if (GetAuraType() == SPELL_AURA_MOD_DAMAGE_FROM_CASTER && GetMiscValue() &&
+        !(GetMiscValue() & spell->GetSchoolMask()))
+        return false;
+
     // Check family name and EffectClassMask
     if (!spell->IsAffected(m_spellInfo->SpellFamilyName, m_spellInfo->Effects[m_effIndex].SpellClassMask))
         return false;
@@ -4645,7 +4649,7 @@ void AuraEffect::HandleAuraModIncreaseHealth(AuraApplication const* aurApp, uint
     {
         if (int32(target->GetHealth()) > GetAmount())
             target->ModifyHealth(-GetAmount());
-        else
+        else if (target->IsAlive())
             target->SetHealth(1);
         target->HandleStatFlatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(GetAmount()), apply);
     }
@@ -6832,7 +6836,8 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         if (caster && GetBase()->GetType() == UNIT_AURA_TYPE &&
             !(GetSpellInfo()->AscensionInheritsResolvedAmount &&
               ((GetSpellInfo()->SpellFamilyName == 31 && GetSpellInfo()->Id == 520497) ||
-               (GetSpellInfo()->SpellFamilyName == 34 && GetSpellInfo()->Id == 706255))))
+               (GetSpellInfo()->SpellFamilyName == 34 && GetSpellInfo()->Id == 706255) ||
+               (GetSpellInfo()->SpellFamilyName == 28 && GetSpellInfo()->Id == 561231))))
             damage = int32(float(damage) * caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
 
         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
@@ -7004,7 +7009,7 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
 
     int32 gain = target->ModifyPower(PowerType, amount);
 
-    if (caster)
+    if (caster && !(PowerType == POWER_MANA && target->GainsManaWithoutThreat()))
         target->GetThreatMgr().ForwardThreatForAssistingMe(caster, float(gain) * 0.5f, GetSpellInfo(), true);
 }
 
@@ -7038,7 +7043,7 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
                     GetCasterGUID().ToString(), target->GetGUID().ToString(), amount, GetId());
     int32 gain = target->ModifyPower(PowerType, amount);
 
-    if (caster)
+    if (caster && !(PowerType == POWER_MANA && target->GainsManaWithoutThreat()))
         target->GetThreatMgr().ForwardThreatForAssistingMe(caster, float(gain) * 0.5f, GetSpellInfo(), true);
 }
 
