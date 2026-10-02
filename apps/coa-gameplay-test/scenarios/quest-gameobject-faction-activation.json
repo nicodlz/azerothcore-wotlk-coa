@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Quest gameobject activation follows faction and explicit objectives",
-  "contract": "Alliance and Horde salvage chests activate only for their own faction, except forced-friendly reputation. Explicit hostile gameobject objectives remain active. This checks native ActivateToQuest on temporary objects, not client rendering, interaction or loot packets. Forced reputation is an explicit fixture setup, not spell acquisition.",
+  "contract": "Opposing quest-loot GOs stay inactive; explicit objectives and forced ranks retain priority.",
   "timeout_ms": 90000,
   "players": [
     {
