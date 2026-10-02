@@ -1,0 +1,688 @@
+{
+  "schema": 1,
+  "name": "Inn-Sane publishes the mana regeneration rate it actually permits (#6084)",
+  "contract": "Effective coa_challenge_definition challenge 76 contains NO_MANA_REGENERATION_UNLESS_RESTED; coa_challenge_spell maps it to aura 93149. The authentic Spell.dbc aura is only a dummy fatigue marker, so the expected mana policy comes from the challenge rule, not that dummy description. Blessing of Wisdom 19742 supplies native aura 85 with resolved amount 10 mana per five seconds: Player::UpdateManaRegen divides that by five and publishes both regeneration rates. A fresh level-one Cultist first demonstrates actual mana regeneration with no challenge. Outside a rested area, Inn-Sane must then suppress actual mana gains and publish zero in both mana regeneration fields. Entering the effective Goldshire tavern trigger 562 must restore mana gains and positive published rates; leaving the tavern must block them again. Stopping Inn-Sane outside must restore normal rates. The sent-rate observations decode native values-only object update fields and fail if the field was never observed; they do not establish rendered client behavior. Aura removal and reapplication must keep both rates zero while blocked and restore the native flat contribution while rested. Normal regeneration must remain positive across rested transitions after the challenge stops.",
+  "timeout_ms": 120000,
+  "location": {
+    "map": 0,
+    "x": -9440,
+    "y": 110,
+    "z": 56.0,
+    "o": 0
+  },
+  "players": [
+    {
+      "id": "cultist",
+      "race": 1,
+      "class": 25,
+      "level": 1
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: outdoors is not rested",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the Cultist has a mana pool",
+      "actor": "cultist",
+      "metric": "max_power",
+      "power": 0,
+      "min": 2
+    },
+    {
+      "action": "set_aura",
+      "actor": "cultist",
+      "spell": 19742,
+      "stacks": 1
+    },
+    {
+      "action": "wait",
+      "label": "Allow the native mana regeneration fields to reach the observer",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the native mana regeneration buff applies",
+      "actor": "cultist",
+      "metric": "aura",
+      "spell": 19742,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal native mana regeneration rate is positive",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal emitted mana regeneration rate is positive",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "min": 1.99,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal native mana regeneration rate is positive",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal emitted mana regeneration rate is positive",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "min": 1.99,
+      "within_ms": 3000
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: mana actually regenerates without a challenge",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "min": 1,
+      "within_ms": 4000
+    },
+    {
+      "action": "start_challenge",
+      "actor": "cultist",
+      "challenge": 76,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: Inn-Sane activates on a fresh lifetime",
+      "actor": "cultist",
+      "metric": "challenge_start_code",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the active challenge grants its actual marker",
+      "actor": "cultist",
+      "metric": "aura",
+      "spell": 93149,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the actor is still outside a rested area",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 0
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "wait",
+      "ms": 4000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: Inn-Sane suppresses actual mana regeneration outdoors",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "equals": 0
+    },
+    {
+      "action": "snapshot",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "save_as": "blocked_native_0"
+    },
+    {
+      "action": "snapshot",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "save_as": "blocked_sent_0"
+    },
+    {
+      "action": "snapshot",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "save_as": "blocked_native_1"
+    },
+    {
+      "action": "snapshot",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "save_as": "blocked_sent_1"
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: Inn-Sane emits zero mana regeneration outdoors",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the native field also reads zero outdoors",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: Inn-Sane emits zero mana regeneration outdoors",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the native field also reads zero outdoors",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "equals": 0
+    },
+    {
+      "action": "set_aura",
+      "actor": "cultist",
+      "spell": 19742,
+      "stacks": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0,
+      "within_ms": 2000
+    },
+    {
+      "action": "set_aura",
+      "actor": "cultist",
+      "spell": 19742,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: aura changes outdoors cannot publish blocked regeneration",
+      "equals": 0,
+      "within_ms": 2000
+    },
+    {
+      "action": "teleport",
+      "actor": "cultist",
+      "map": 0,
+      "x": -9483.25,
+      "y": -17.9883,
+      "z": 56.9634
+    },
+    {
+      "action": "area_trigger",
+      "actor": "cultist",
+      "id": 562
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the native tavern trigger enters a rested state",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: Inn-Sane allows actual regeneration inside the inn",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "min": 1,
+      "within_ms": 4000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the inn restores positive native regeneration",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the inn restores positive emitted regeneration",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "min": 1.99,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the inn restores positive native regeneration",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: the inn restores positive emitted regeneration",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "min": 1.99,
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "cultist",
+      "spell": 19742,
+      "stacks": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: rested aura removal clears its interrupted contribution",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: rested aura removal clears its interrupted contribution",
+      "equals": 0,
+      "within_ms": 2000
+    },
+    {
+      "action": "set_aura",
+      "actor": "cultist",
+      "spell": 19742,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: rested aura reapplication restores regeneration",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: rested aura reapplication restores regeneration",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: rested aura reapplication restores regeneration",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: rested aura reapplication restores regeneration",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "teleport",
+      "actor": "cultist",
+      "map": 0,
+      "x": -9440,
+      "y": 110,
+      "z": 56.0
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: leaving the inn removes the rested state",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 0,
+      "within_ms": 4000
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "wait",
+      "ms": 4000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: leaving the inn blocks actual mana regeneration again",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: leaving the inn emits zero regeneration again",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: leaving the inn emits zero regeneration again",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "stop_challenge",
+      "actor": "cultist",
+      "challenge": 76
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: stopping Inn-Sane removes its marker",
+      "actor": "cultist",
+      "metric": "aura",
+      "spell": 93149,
+      "equals": 0,
+      "within_ms": 3000
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: stopping Inn-Sane restores actual mana regeneration",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "min": 1,
+      "within_ms": 4000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: stopping Inn-Sane restores positive emitted regeneration",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "min": 1.99,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: stopping Inn-Sane restores positive emitted regeneration",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "min": 1.99,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: stopping Inn-Sane restores both native rates",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: stopping Inn-Sane restores both native rates",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: stopping Inn-Sane restores both native rates",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: stopping Inn-Sane restores both native rates",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "teleport",
+      "actor": "cultist",
+      "map": 0,
+      "x": -9483.25,
+      "y": -17.9883,
+      "z": 56.9634
+    },
+    {
+      "action": "area_trigger",
+      "actor": "cultist",
+      "id": 562
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal control enters rested state",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: normal rested regeneration remains positive",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: normal rested regeneration remains positive",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: normal rested regeneration remains positive",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: normal rested regeneration remains positive",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "teleport",
+      "actor": "cultist",
+      "map": 0,
+      "x": -9440,
+      "y": 110,
+      "z": 56
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: normal control leaves rested state",
+      "actor": "cultist",
+      "metric": "resting",
+      "equals": 0,
+      "within_ms": 4000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: normal outdoor regeneration remains positive",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 0,
+      "label": "CONTRACT: normal outdoor regeneration remains positive",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: normal outdoor regeneration remains positive",
+      "min": 1.99
+    },
+    {
+      "action": "assert",
+      "actor": "cultist",
+      "metric": "sent_mana_regen_rate",
+      "effect": 1,
+      "label": "CONTRACT: normal outdoor regeneration remains positive",
+      "min": 1.99,
+      "within_ms": 2000
+    },
+    {
+      "action": "set_power",
+      "actor": "cultist",
+      "power": 0,
+      "value": 0
+    },
+    {
+      "action": "assert",
+      "label": "CONTRACT: normal regeneration still gains mana after rested transitions",
+      "actor": "cultist",
+      "metric": "power",
+      "power": 0,
+      "min": 1,
+      "within_ms": 4000
+    }
+  ]
+}
