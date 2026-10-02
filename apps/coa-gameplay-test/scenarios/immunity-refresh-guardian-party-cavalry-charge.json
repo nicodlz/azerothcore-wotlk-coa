@@ -1,0 +1,590 @@
+{
+  "schema": 1,
+  "name": "Guardian Cavalry Charge tracks each party recipient",
+  "contract": "An active protection aura grants the native spell/mechanic/dispel immunity; refreshing that same aura must not create extra immunity applications. Native cancellation and natural expiry must leave no protection once the aura is absent. set_aura is explicit fixture setup and invokes the actual AddAura/SetStackAmount path. The spell_immune/spell_effect_immune metrics call real production immunity eligibility methods against authentic Spell.dbc probe records; this does not measure cast delivery or client rendering. Two grouped players receive the same caster-owned area aura. Each must acquire and relinquish its own root and snare immunity; tracking one flag for the shared AuraScript is insufficient.",
+  "timeout_ms": 90000,
+  "players": [
+    {
+      "id": "owner",
+      "race": 1,
+      "class": 18,
+      "level": 80
+    },
+    {
+      "id": "ally",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    }
+  ],
+  "creatures": [
+    {
+      "id": "enemy",
+      "owner": "owner",
+      "entry": 36,
+      "distance": 3
+    }
+  ],
+  "steps": [
+    {
+      "action": "group",
+      "actor": "owner",
+      "target": "ally"
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 503631,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No immunity before the protection aura"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No immunity before the protection aura",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No immunity before the protection aura"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No immunity before the protection aura",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "cancel_aura",
+      "actor": "owner",
+      "spell": 804691
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No residual immunity after cancel"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No residual immunity after cancel",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No residual immunity after cancel"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No residual immunity after cancel",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "owner",
+      "spell": 804691,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 1,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 1,
+      "target": "enemy",
+      "effect": 0,
+      "label": "Protection stays active after refresh",
+      "within_ms": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 11000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "aura",
+      "spell": 804691,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No residual immunity after expire"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 122,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 1,
+      "label": "No residual immunity after expire",
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No residual immunity after expire"
+    },
+    {
+      "action": "assert",
+      "actor": "ally",
+      "metric": "spell_effect_immune",
+      "spell": 116,
+      "equals": 0,
+      "target": "enemy",
+      "effect": 0,
+      "label": "No residual immunity after expire",
+      "within_ms": 1000
+    }
+  ]
+}
