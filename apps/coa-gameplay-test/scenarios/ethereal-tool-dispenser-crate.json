@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Ethereal Tool Dispenser Crate grants one dispenser and preserves failed exchanges",
-  "contract": "The tooltip of item 8263511 promises \"Contains a brand new Ethereal Tool Dispenser!\". Using the crate must grant exactly one item 8263501 and consume that crate. With full bags the crate must remain and no reward is lost. Other items sharing Smoke (60034) must retain their own behavior.",
+  "contract": "Using an Ethereal Tool Dispenser crate grants one dispenser, or preserves the crate when bags are full.",
   "timeout_ms": 30000,
   "players": [
     {
