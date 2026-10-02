@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "name": "Shadowforge Flame Keepers always drop the Lyceum torch",
+  "contract": "Shadowforge Torch 11885 is consumed when lighting the Lyceum braziers. Upstream #27732 records live research confirming guaranteed Flame Keeper drops. The effective CoA loot template 9956 retains the legacy 94.3506 percent ordinary, ungrouped single-item row and 300-second spawns. Sample 1000 native loot fills: every fill must contain the torch. Anvilrage Soldier 8893 stays unable to drop the torch and Runecloth 14047 remains an ordinary non-guaranteed drop. This verifies native loot generation, not the brazier interaction or dungeon completion.",
+  "players": [
+    {
+      "id": "keeper",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "keeper",
+      "metric": "creature_loot_item_rate",
+      "entry": 8893,
+      "item": 11885,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "keeper",
+      "metric": "creature_loot_item_rate",
+      "entry": 9956,
+      "item": 14047,
+      "min": 1,
+      "max": 99.9
+    },
+    {
+      "action": "assert",
+      "actor": "keeper",
+      "metric": "creature_loot_item_rate",
+      "entry": 9956,
+      "item": 11885,
+      "equals": 100
+    }
+  ]
+}

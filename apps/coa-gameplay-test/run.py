@@ -87,6 +87,7 @@ METRICS = {
     'spell_heal_count', 'spell_heal_total', 'spell_effective_heal_total',
     'pet_aura_amount', 'pet_aura_amplitude_ms', 'pet_max_health', 'pet_attack_power', 'pet_run_speed_rate',
     'distance', 'spell_proc_count', 'temporary_spell_replacement', 'creature_loot_quality_rate',
+    'creature_loot_item_rate',
     'quest_menu_items', 'quest_menu_has', 'player_setting', 'server_packets', 'server_packet_contains',
     'player_class', 'cached_class', 'at_login_flag', 'wildcard_starter_spells_known', 'action_bar_unknown_spells',
     'wildcard_spells_known', 'wildcard_cards_pending', 'wildcard_cards_collected', 'wildcard_roll_cards_set',
@@ -652,6 +653,7 @@ def validate(scenario):
                           'cast_speed_multiplier', 'spell_crit_chance', 'spell_power_cost',
                           'spell_damage_done', 'melee_damage_done',
                           'who_count', 'who_class',
+                          'creature_loot_item_rate',
                           'loot_count', 'loot_entry', 'loot_received', 'quest_rewarded', 'has_achievement',
                           'has_title',
                           'quest_status', 'quest_takeable', 'quest_objective_count', 'dialog_status',
@@ -666,6 +668,8 @@ def validate(scenario):
                           'wildcard_cards_collected', 'wildcard_roll_cards_set',
                           'wildcard_roll_cards_used', 'wildcard_bonus_pack_progress'} | PLAYER_STAT_METRICS:
                 require(step['actor'] in player_ids, f'{where}: metric needs a player')
+            if metric == 'creature_loot_item_rate':
+                require('entry' in step and 'item' in step, f'{where}: item loot rate needs entry and item')
             shape = (metric, step.get('exclude'))
             if 'relative_to' in step:
                 require(snapshots.get(step['relative_to']) == shape, f'{where}: missing or incompatible snapshot')
