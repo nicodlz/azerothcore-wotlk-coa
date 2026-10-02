@@ -2,7 +2,7 @@
   "schema": 1,
   "timeout_ms": 90000,
   "name": "Captured Rageclaw: native NPC aggro postpones release despawn until evade",
-  "contract": "Gultask reviewed 40 releases in upstream PR 27770 (#issuecomment-5803446902): flags change from 33280 to 32768, faction 2117 stays unchanged; a 33-second fight despawns 0.8 seconds after evade. Real Drakuru Shackles 29700 receives spell 55083 from a nearby fixture NPC to invoke its unchanged release SAI. Aggressive Rageclaw faction 2117 and Drakuru Blood Drinker faction 2068 select each other naturally; no attack-start or immunity edits fixture the result. Large health keeps combat alive past twelve seconds. A fixture instakill ends combat, then the released Rageclaw disappears. Persistent-spawn respawn, death before the timer and random movement radius are untested.",
+  "contract": "Freed Rageclaws fight nearby trolls and despawn after combat once the release timer expires.",
   "players": [
     {
       "id": "observer",

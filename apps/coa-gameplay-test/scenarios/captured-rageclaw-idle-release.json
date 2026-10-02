@@ -2,7 +2,7 @@
   "schema": 1,
   "timeout_ms": 90000,
   "name": "Captured Rageclaw: ordinary shackle item grants credit and expires while idle",
-  "contract": "Gultask reviewed 40 releases in upstream PR 27770 (#issuecomment-5803446902). Every release clears NPC immunity; 33 idle despawns occur 10.1\u201311.7 seconds after release. Quest 12861 release credit remains one. This checks native item use, chained aura removal, credit, survival at nine seconds and despawn by thirteen seconds. Client rendering and persistent-spawn respawn are untested.",
+  "contract": "Unlocking a shackle grants quest credit; an idle Rageclaw despawns ten to twelve seconds later.",
   "players": [
     {
       "id": "observer",
