@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "name": "Friendly selected-effect union and immunity hit controls 3991",
+  "contract": "Core-selection regression using the authentic client test record 999977, not a claim of player acquisition or normal auto-repeat casting. A never-cast native Spell receives ally target effects through AddUnitTargetForScript in both orders. Effect 0 heals, effect 1 damages; both target an explicit ally. At level16 versus level80 the mixed final target must retain an offensive miss roll; no more than ten NONE results among64 native attempts, with accidental threshold failure below1e-10 for a1-percent hit floor. Positive-only selection must have64 NONE results. DivineShield642 provides a native whole-spell school immunity control, checked before any positive-effect hit bypass. The probe rejects reflectable spell records before target selection, does not alter hit statistics or seed random state, and never submits a cast. The separate SeismicWave scenario covers ordinary casts and real healing events.",
+  "players": [
+    {
+      "id": "primalist",
+      "race": 1,
+      "class": 31,
+      "level": 16
+    },
+    {
+      "id": "high",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    }
+  ],
+  "location": {
+    "map": 0,
+    "x": -9617.06,
+    "y": -288.949,
+    "z": 57.3053,
+    "o": 0
+  },
+  "timeout_ms": 30000,
+  "steps": [
+    {
+      "action": "teleport",
+      "actor": "high",
+      "map": 0,
+      "x": -9616.06,
+      "y": -288.949,
+      "z": 57.3053,
+      "o": 0
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        1,
+        2
+      ],
+      "save_as": "positive_then_negative"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        2,
+        1
+      ],
+      "save_as": "negative_then_positive"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        1
+      ],
+      "save_as": "positive_only"
+    },
+    {
+      "action": "assert",
+      "label": "A mixed mask retains the ordinary hit roll",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        1,
+        2
+      ],
+      "max": 10
+    },
+    {
+      "action": "assert",
+      "label": "A mixed mask retains the ordinary hit roll",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        2,
+        1
+      ],
+      "max": 10
+    },
+    {
+      "action": "set_aura",
+      "actor": "high",
+      "spell": 642,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "high",
+      "metric": "aura",
+      "spell": 642,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "high",
+      "target": "primalist",
+      "metric": "spell_immune",
+      "spell": 999977,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "School immunity precedes beneficial hit handling",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 7,
+      "effect_masks": [
+        1
+      ],
+      "equals": 64
+    },
+    {
+      "action": "assert",
+      "label": "School immunity precedes beneficial hit handling",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 7,
+      "effect_masks": [
+        1,
+        2
+      ],
+      "equals": 64
+    },
+    {
+      "action": "assert",
+      "label": "School immunity precedes beneficial hit handling",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 7,
+      "effect_masks": [
+        2,
+        1
+      ],
+      "equals": 64
+    },
+    {
+      "action": "set_aura",
+      "actor": "high",
+      "spell": 642,
+      "stacks": 0
+    },
+    {
+      "action": "assert",
+      "actor": "high",
+      "metric": "aura",
+      "spell": 642,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "target": "high",
+      "metric": "spell_target_result_count",
+      "spell": 999977,
+      "samples": 64,
+      "miss": 0,
+      "effect_masks": [
+        1
+      ],
+      "equals": 64
+    }
+  ]
+}

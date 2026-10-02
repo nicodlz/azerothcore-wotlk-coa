@@ -2136,6 +2136,41 @@ private:
             Require(sFactionStore.LookupEntry(faction) != nullptr, "Unknown reputation faction");
             return player->CalculateReputationGain(REPUTATION_SOURCE_SPELL, player->GetLevel(), 1000, int32(faction));
         }
+        if (metric == "spell_target_result_count")
+        {
+            SpellInfo const* info = sSpellMgr->GetSpellInfo(spell);
+            Require(info != nullptr, "Unknown target-result probe spell");
+            Require(info->HasAttribute(SPELL_ATTR0_IS_ABILITY),
+                "Target-result probe requires a nonreflectable ability");
+            Unit* target = GetUnit(step.get<std::string>("target"));
+            uint32 samples = step.get<uint32>("samples", 64);
+            uint32 miss = step.get<uint32>("miss", SPELL_MISS_NONE);
+            Require(samples > 0 && samples <= 128 && miss <= SPELL_MISS_REFLECT,
+                "Invalid target-result probe sample count or result");
+            std::vector<uint32> masks;
+            for (auto const& item : step.get_child("effect_masks"))
+            {
+                uint32 mask = item.second.get_value<uint32>();
+                Require(mask && !(mask & ~MAX_EFFECT_MASK), "Invalid target-result probe effect mask");
+                masks.push_back(mask);
+            }
+            Require(!masks.empty() && masks.size() <= MAX_SPELL_EFFECTS, "Invalid target-result probe effect list");
+            uint32 count = 0;
+            for (uint32 sample = 0; sample < samples; ++sample)
+            {
+                auto probe = std::make_unique<Spell>(player, info, TRIGGERED_NONE);
+                for (uint32 mask : masks)
+                    probe->AddUnitTargetForScript(target, mask, false, false);
+                auto const& targets = *probe->GetUniqueTargetInfo();
+                Require(targets.size() == 1 && targets.front().targetGUID == target->GetGUID(),
+                    "Target-result probe did not select exactly one target");
+                Require(targets.front().missCondition != SPELL_MISS_REFLECT,
+                    "Target-result probe cannot schedule reflection events");
+                if (uint32(targets.front().missCondition) == miss)
+                    ++count;
+            }
+            return count;
+        }
         if (metric == "spell_immune" || metric == "spell_effect_immune")
         {
             SpellInfo const* info = sSpellMgr->GetSpellInfo(spell);

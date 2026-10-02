@@ -1,0 +1,669 @@
+{
+  "schema": 1,
+  "name": "Primalist Seismic Wave heals higher-level allies 3991",
+  "contract": "Regression for report #3991. Authentic Spell.dbc 805462 heals allies (effect 0, target 31) and damages enemies (effect 1, target 16). Healing a friendly target must not depend on its level or offensive spell hit rating. Ten ordinary Seismic Wave casts from a level-16 Primalist must each record a native healing event on the level-80 ally. A level-16 ally and ordinary pure Flash Heal 2061 to the level-80 ally control selection and friendly healing. The level-80 enemy remains subject to the original offensive hit roll: at most five damage events across ten casts; with the core 1-percent minimum hit chance the accidental failure probability is below 3e-10. No random state or hit stats are changed. Cooldowns and rage are restored between casts as fixtures; recharge behavior is outside this regression. Native event counts and completed casts exclude passive health regeneration and cast submission failures.",
+  "players": [
+    {
+      "id": "primalist",
+      "race": 1,
+      "class": 31,
+      "level": 16
+    },
+    {
+      "id": "high",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    },
+    {
+      "id": "low",
+      "race": 1,
+      "class": 1,
+      "level": 16
+    },
+    {
+      "id": "priest",
+      "race": 1,
+      "class": 5,
+      "level": 16
+    }
+  ],
+  "creatures": [
+    {
+      "id": "enemy_high",
+      "owner": "primalist",
+      "entry": 28168,
+      "level": 80,
+      "health": 500000,
+      "distance": 3
+    }
+  ],
+  "location": {
+    "map": 0,
+    "x": -9617.06,
+    "y": -288.949,
+    "z": 57.3053,
+    "o": 0
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": "teleport",
+      "actor": "high",
+      "map": 0,
+      "x": -9616.06,
+      "y": -288.949,
+      "z": 57.3053,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "high",
+      "maximum": 1000000,
+      "value": 1000
+    },
+    {
+      "action": "teleport",
+      "actor": "low",
+      "map": 0,
+      "x": -9615.06,
+      "y": -288.949,
+      "z": 57.3053,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "low",
+      "maximum": 1000000,
+      "value": 1000
+    },
+    {
+      "action": "teleport",
+      "actor": "priest",
+      "map": 0,
+      "x": -9613.06,
+      "y": -288.949,
+      "z": 57.3053,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "priest",
+      "maximum": 1000000,
+      "value": 1000
+    },
+    {
+      "action": "group",
+      "actor": "primalist",
+      "target": "high"
+    },
+    {
+      "action": "group",
+      "actor": "primalist",
+      "target": "low"
+    },
+    {
+      "action": "set_health",
+      "actor": "primalist",
+      "maximum": 1000000,
+      "value": 1000
+    },
+    {
+      "action": "specialization",
+      "actor": "primalist",
+      "id": 58
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 805462,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572873,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572874,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572875,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572876,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572877,
+      "all_specs": true
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 572878,
+      "all_specs": true
+    },
+    {
+      "action": "learn",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "knows_spell",
+      "spell": 805462,
+      "equals": 1
+    },
+    {
+      "action": "learn",
+      "actor": "priest",
+      "spell": 2061
+    },
+    {
+      "action": "snapshot",
+      "actor": "priest",
+      "metric": "spell_heal_count",
+      "spell": 2061,
+      "target": "high",
+      "save_as": "pure_before"
+    },
+    {
+      "action": "cast",
+      "actor": "priest",
+      "spell": 2061,
+      "target": "high"
+    },
+    {
+      "action": "assert",
+      "actor": "priest",
+      "metric": "spell_heal_count",
+      "spell": 2061,
+      "target": "high",
+      "relative_to": "pure_before",
+      "equals": 1,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "priest",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 2061
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "high",
+      "save_as": "high_before"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "low",
+      "save_as": "low_before"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_damage_count",
+      "spell": 805462,
+      "target": "enemy_high",
+      "save_as": "enemy_before"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "save_as": "casts_before"
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 1/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 2/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 2
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 3/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 3
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 4/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 4
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 5/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 5
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 6/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 6
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 7/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 7
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 8/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 8
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 9/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 9
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "set_power",
+      "actor": "primalist",
+      "power": 1,
+      "value": 1000
+    },
+    {
+      "action": "cast",
+      "label": "Ordinary Seismic Wave cast 10/10",
+      "actor": "primalist",
+      "spell": 805462
+    },
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "spell_cast_count",
+      "spell": 805462,
+      "relative_to": "casts_before",
+      "equals": 10
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "cast_failure",
+      "equals": 0,
+      "spell": 805462
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "high",
+      "save_as": "high_events"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_effective_heal_total",
+      "spell": 805462,
+      "target": "high",
+      "save_as": "high_effective"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "low",
+      "save_as": "low_events"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_damage_count",
+      "spell": 805462,
+      "target": "enemy_high",
+      "save_as": "enemy_events"
+    },
+    {
+      "action": "snapshot",
+      "actor": "primalist",
+      "metric": "spell_damage_total",
+      "spell": 805462,
+      "target": "enemy_high",
+      "save_as": "enemy_damage"
+    },
+    {
+      "action": "assert",
+      "label": "Lower-level ally selection control",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "low",
+      "relative_to": "low_before",
+      "min": 1,
+      "max": 10
+    },
+    {
+      "action": "assert",
+      "label": "Offensive higher-level enemy keeps its miss roll",
+      "actor": "primalist",
+      "metric": "spell_damage_count",
+      "spell": 805462,
+      "target": "enemy_high",
+      "relative_to": "enemy_before",
+      "max": 5
+    },
+    {
+      "action": "assert",
+      "label": "Every completed Seismic Wave heals the higher-level ally",
+      "actor": "primalist",
+      "metric": "spell_heal_count",
+      "spell": 805462,
+      "target": "high",
+      "relative_to": "high_before",
+      "equals": 10
+    }
+  ]
+}

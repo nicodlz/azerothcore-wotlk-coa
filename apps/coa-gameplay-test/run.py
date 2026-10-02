@@ -83,7 +83,7 @@ METRICS = {
     'script_spell_damage_taken', 'script_periodic_damage_taken', 'script_heal_received', 'spell_effect_value',
     'block_chance', 'block_value', 'critical_block_chance', 'spell_critical_damage', 'armor_reduced_damage',
     'aoe_damage_taken', 'reputation_gain', 'spell_immune', 'spell_effect_immune', 'melee_attack_count',
-    'spell_damage_count', 'spell_damage_total', 'spell_uses_armor',
+    'spell_damage_count', 'spell_damage_total', 'spell_uses_armor', 'spell_target_result_count',
     'spell_heal_count', 'spell_heal_total', 'spell_effective_heal_total',
     'pet_aura_amount', 'pet_aura_amplitude_ms', 'pet_max_health', 'pet_attack_power', 'pet_run_speed_rate',
     'distance', 'spell_proc_count', 'temporary_spell_replacement', 'creature_loot_quality_rate',
@@ -106,7 +106,7 @@ PLAYER_STAT_METRICS = {
     'script_heal_received', 'spell_effect_value',
     'block_chance', 'block_value', 'critical_block_chance', 'spell_critical_damage', 'armor_reduced_damage',
     'aoe_damage_taken', 'reputation_gain', 'spell_immune', 'spell_effect_immune', 'melee_attack_count',
-    'spell_damage_count', 'spell_damage_total', 'spell_uses_armor',
+    'spell_damage_count', 'spell_damage_total', 'spell_uses_armor', 'spell_target_result_count',
     'spell_heal_count', 'spell_heal_total', 'spell_effective_heal_total',
     'pet_aura_amount', 'pet_aura_amplitude_ms', 'pet_aura_duration_ms', 'pet_max_health', 'pet_attack_power',
     'pet_run_speed_rate',
@@ -115,7 +115,7 @@ METRIC_FIELDS = {'actor', 'metric', 'spell', 'power', 'caster', 'effect', 'item'
                  'relative_to', 'ratio_to', 'target', 'quest', 'id', 'stat', 'school', 'hand', 'rating', 'op',
                  'base', 'key', 'index', 'pet', 'critical', 'target_pet', 'periodic', 'name', 'text',
                  'min_distance', 'owner_display', 'skill', 'cache', 'table', 'exclude', 'dungeon', 'source',
-                 'opcode', 'from', 'slot', 'achievement', 'title'}
+                 'opcode', 'from', 'slot', 'achievement', 'title', 'samples', 'miss', 'effect_masks'}
 ACTIONS = {
     'stop_attack': ({'actor'}, {'actor'}),
     'set_moving': ({'actor', 'enabled'}, {'actor', 'enabled'}),
@@ -494,7 +494,8 @@ def validate(scenario):
                     'spell_done_crit_chance_scripted',
                     'melee_spell_damage_done', 'script_spell_damage_taken', 'script_periodic_damage_taken',
                     'script_heal_received', 'spell_effect_value', 'spell_critical_damage', 'armor_reduced_damage',
-                    'spell_immune', 'spell_effect_immune', 'spell_damage_count', 'spell_damage_total',
+                    'spell_immune', 'spell_effect_immune', 'spell_target_result_count',
+                    'spell_damage_count', 'spell_damage_total',
                     'spell_uses_armor', 'pet_aura_amount', 'pet_aura_amplitude_ms', 'spell_heal_count', 'spell_heal_total',
                     'spell_effective_heal_total', 'spell_energize_count', 'spell_energize_total',
                     'spell_proc_count', 'temporary_spell_replacement', 'cast_failure',
@@ -521,9 +522,20 @@ def validate(scenario):
                           'spell_healing_done', 'spell_healing_taken', 'spell_done_crit_chance',
                           'spell_taken_crit_chance', 'spell_done_crit_chance_scripted', 'melee_spell_damage_done',
                           'spell_critical_damage', 'armor_reduced_damage', 'spell_immune', 'spell_effect_immune',
+                          'spell_target_result_count',
                           'distance_2d', 'can_detect'} \
                     or metric.startswith('script_'):
                 require('target' in step, f'{where}: damage metric needs target')
+            if {'samples', 'miss', 'effect_masks'} & step.keys():
+                require(metric == 'spell_target_result_count', f'{where}: target-result fields need matching metric')
+            if metric == 'spell_target_result_count':
+                number(step.get('samples', 64), f'{where}.samples', 1, 128, True)
+                number(step.get('miss', 0), f'{where}.miss', 0, 11, True)
+                masks = step.get('effect_masks')
+                require(isinstance(masks, list) and 1 <= len(masks) <= 3,
+                        f'{where}: effect_masks needs one to three masks')
+                for mask in masks:
+                    number(mask, f'{where}.effect_masks', 1, 7, True)
             if metric == 'distance':
                 require('target' in step, f'{where}: {metric} metric needs target')
             if metric == 'stat':
