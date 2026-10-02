@@ -304,18 +304,6 @@
       "equals": 0
     },
     {
-      "action": "learn",
-      "actor": "primalist",
-      "spell": 803347
-    },
-    {
-      "action": "assert",
-      "actor": "primalist",
-      "metric": "pet_aura_stacks",
-      "spell": 803349,
-      "equals": 1
-    },
-    {
       "action": "set_power",
       "actor": "primalist",
       "power": 2,
@@ -358,6 +346,18 @@
       "save_as": "talented_owner_crits"
     },
     {
+      "action": "learn",
+      "actor": "primalist",
+      "spell": 803347
+    },
+    {
+      "action": "assert",
+      "actor": "primalist",
+      "metric": "pet_aura_stacks",
+      "spell": 803349,
+      "equals": 1
+    },
+    {
       "action": "cast",
       "actor": "primalist",
       "spell": 706342,
@@ -376,6 +376,11 @@
       "critical": true,
       "relative_to": "talented_owner_crits",
       "min": 1
+    },
+    {
+      "action": "unlearn",
+      "actor": "primalist",
+      "spell": 803347
     },
     {
       "action": "assert",
@@ -453,6 +458,11 @@
       "pet": true,
       "critical": true,
       "save_as": "talented_pet_crits"
+    },
+    {
+      "action": "learn",
+      "actor": "primalist",
+      "spell": 803347
     },
     {
       "action": "cast",
