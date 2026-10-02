@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Beastmaster's Whistle: Barnabus tames an animal spirit",
-  "contract": "Item 79567 casts dummy spell 79347, whose authentic tooltip promises to tame Barnabus; its VanityCollection record associates creature 2753. A Spirit Beast Wildwalker uses the inventory item to obtain a persistent Barnabus pet. An ordinary Warrior remains without a pet, and repeating the item with a current pet creates no additional saved pet.",
+  "contract": "Item 79567 casts dummy spell 79347, whose authentic tooltip promises to tame Barnabus; its VanityCollection record associates creature 2753. A Spirit Beast Wildwalker uses the inventory item to obtain a persistent Barnabus pet. An ordinary Warrior remains without a pet, and repeating the item with a current pet creates no additional saved pet. Every inventory use must complete exactly one normal spell cast and report no cast failure, so the Warrior and repeated-use guards cannot pass due to a native cast refusal. Spell 79347 and item 79567 have zero spell/category recovery and no global recovery in the inspected authentic/effective data; the scenario still waits 1500 ms between uses and does not reset cooldowns.",
   "timeout_ms": 60000,
   "players": [
     {
@@ -53,10 +53,34 @@
       "equals": 0
     },
     {
+      "action": "snapshot",
+      "actor": "warrior",
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "save_as": "whistle_casts_1"
+    },
+    {
       "action": "use_item",
       "actor": "warrior",
       "item": 79567,
       "spell": 79347
+    },
+    {
+      "action": "assert",
+      "label": "The inventory cast completes without a native rejection",
+      "actor": "warrior",
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "relative_to": "whistle_casts_1",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "warrior",
+      "metric": "cast_failure",
+      "spell": 79347,
+      "equals": 0
     },
     {
       "action": "wait",
@@ -75,10 +99,34 @@
       "equals": 0
     },
     {
+      "action": "snapshot",
+      "actor": "wildwalker",
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "save_as": "whistle_casts_2"
+    },
+    {
       "action": "use_item",
       "actor": "wildwalker",
       "item": 79567,
       "spell": 79347
+    },
+    {
+      "action": "assert",
+      "label": "The inventory cast completes without a native rejection",
+      "actor": "wildwalker",
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "relative_to": "whistle_casts_2",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "cast_failure",
+      "spell": 79347,
+      "equals": 0
     },
     {
       "action": "assert",
@@ -99,15 +147,34 @@
       "ms": 1500
     },
     {
-      "action": "reset_cooldown",
+      "action": "snapshot",
       "actor": "wildwalker",
-      "spell": 79347
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "save_as": "whistle_casts_3"
     },
     {
       "action": "use_item",
       "actor": "wildwalker",
       "item": 79567,
       "spell": 79347
+    },
+    {
+      "action": "assert",
+      "label": "The inventory cast completes without a native rejection",
+      "actor": "wildwalker",
+      "metric": "spell_cast_count",
+      "spell": 79347,
+      "relative_to": "whistle_casts_3",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "cast_failure",
+      "spell": 79347,
+      "equals": 0
     },
     {
       "action": "wait",
