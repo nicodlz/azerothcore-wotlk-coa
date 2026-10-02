@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "timeout_ms": 90000,
+  "name": "Captured Rageclaw: ordinary shackle item grants credit and expires while idle",
+  "contract": "Gultask reviewed 40 releases in upstream PR 27770 (#issuecomment-5803446902). Every release clears NPC immunity; 33 idle despawns occur 10.1\u201311.7 seconds after release. Quest 12861 release credit remains one. This checks native item use, chained aura removal, credit, survival at nine seconds and despawn by thirteen seconds. Client rendering and persistent-spawn respawn are untested.",
+  "players": [
+    {
+      "id": "observer",
+      "race": 1,
+      "class": 8,
+      "level": 80,
+      "spell_hit_rating": 10000
+    }
+  ],
+  "creatures": [
+    {
+      "id": "rageclaw",
+      "owner": "observer",
+      "entry": 29686,
+      "faction": 2117,
+      "level": 80,
+      "health": 1000000,
+      "distance": 3.5
+    },
+    {
+      "id": "shackles",
+      "owner": "observer",
+      "entry": 29700,
+      "faction": 35,
+      "level": 80,
+      "health": 1000000,
+      "distance": 2
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 2000
+    },
+    {
+      "action": "assert",
+      "actor": "rageclaw",
+      "metric": "aura",
+      "spell": 55009,
+      "equals": 1
+    },
+    {
+      "action": "prepare_quest",
+      "actor": "observer",
+      "quest": 12861,
+      "complete": false
+    },
+    {
+      "action": "add_item",
+      "actor": "observer",
+      "item": 41161
+    },
+    {
+      "action": "use_item",
+      "actor": "observer",
+      "item": 41161,
+      "spell": 55083,
+      "target": "shackles"
+    },
+    {
+      "action": "assert",
+      "actor": "observer",
+      "metric": "quest_objective_count",
+      "quest": 12861,
+      "index": 0,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "rageclaw",
+      "metric": "aura",
+      "spell": 55009,
+      "equals": 0
+    },
+    {
+      "action": "wait",
+      "ms": 9000
+    },
+    {
+      "action": "assert",
+      "actor": "observer",
+      "metric": "nearby_creature_count",
+      "entry": 29686,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "observer",
+      "metric": "nearby_creature_count",
+      "entry": 29686,
+      "equals": 0,
+      "within_ms": 4000
+    }
+  ],
+  "location": {
+    "map": 0,
+    "x": -9465,
+    "y": 64,
+    "z": 55.8,
+    "o": 0
+  }
+}
