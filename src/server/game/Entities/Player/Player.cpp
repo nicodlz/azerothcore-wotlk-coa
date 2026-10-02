@@ -2666,7 +2666,10 @@ void Player::GiveLevel(uint8 level)
         pet->SynchronizeLevelWithOwner();
 
     MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask());
-    if (mailReward && sScriptMgr->OnPlayerCanGiveMailRewardAtGiveLevel(this, level))
+    bool const isOutlandFlyingInvitation = mailReward &&
+        (mailReward->mailTemplateId == 282 || mailReward->mailTemplateId == 283);
+    if (mailReward && (!isOutlandFlyingInvitation || GetSession()->Expansion() >= EXPANSION_THE_BURNING_CRUSADE)
+        && sScriptMgr->OnPlayerCanGiveMailRewardAtGiveLevel(this, level))
     {
         //- TODO: Poor design of mail system
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();

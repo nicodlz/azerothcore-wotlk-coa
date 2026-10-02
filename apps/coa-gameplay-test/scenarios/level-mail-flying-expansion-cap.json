@@ -1,0 +1,400 @@
+{
+  "schema": 1,
+  "name": "Flying training level mail respects the session expansion cap for both factions",
+  "contract": "Expansion=0 disables expansion content according to worldserver.conf.dist. WorldSocket account loading clamps each real session to CONFIG_EXPANSION. The fixture expansion field follows that native cap. Effective stock mail_level_reward rows send template 283 from Hargen Bronzewing (35100) to Alliance race mask 1101 and template 282 from Wind Rider Jahubo (35093) to Horde race mask 690 at level 60. Installed MailTemplate.dbc explicitly invites the player to Honor Hold or Thrallmar in Hellfire Peninsula; both sender creatures spawn on Outland map 530, which requires The Burning Crusade. A vanilla session must receive neither invitation, while TBC and WotLK sessions must receive their faction invitation. All six sessions must still receive the ordinary ground-riding invitation at level 20. The test waits after each level transition before asserting absence, and snapshots after level-59 fixture mail has settled. It tests native level-up mail acquisition and delivery, not client rendering.",
+  "timeout_ms": 120000,
+  "location": {
+    "map": 0,
+    "x": -8816.5,
+    "y": 627.0,
+    "z": 94.1,
+    "o": 3.8
+  },
+  "players": [
+    {
+      "id": "alliance0",
+      "race": 1,
+      "class": 16,
+      "level": 19,
+      "expansion": 0
+    },
+    {
+      "id": "horde0",
+      "race": 2,
+      "class": 16,
+      "level": 19,
+      "expansion": 0
+    },
+    {
+      "id": "alliance1",
+      "race": 1,
+      "class": 16,
+      "level": 19,
+      "expansion": 1
+    },
+    {
+      "id": "horde1",
+      "race": 2,
+      "class": 16,
+      "level": 19,
+      "expansion": 1
+    },
+    {
+      "id": "alliance2",
+      "race": 1,
+      "class": 16,
+      "level": 19,
+      "expansion": 2
+    },
+    {
+      "id": "horde2",
+      "race": 2,
+      "class": 16,
+      "level": 19,
+      "expansion": 2
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "label": "Let level fixtures settle",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance0",
+      "metric": "mail_count",
+      "save_as": "alliance0_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance0",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance0: ground riding invitation remains available",
+      "actor": "alliance0",
+      "metric": "mail_count",
+      "relative_to": "alliance0_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance0",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance0",
+      "metric": "mail_count",
+      "save_as": "alliance0_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance0",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance0: flying invitation is suppressed without Outland access",
+      "actor": "alliance0",
+      "metric": "mail_count",
+      "relative_to": "alliance0_before_flying",
+      "equals": 0
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde0",
+      "metric": "mail_count",
+      "save_as": "horde0_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde0",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde0: ground riding invitation remains available",
+      "actor": "horde0",
+      "metric": "mail_count",
+      "relative_to": "horde0_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "horde0",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde0",
+      "metric": "mail_count",
+      "save_as": "horde0_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde0",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde0: flying invitation is suppressed without Outland access",
+      "actor": "horde0",
+      "metric": "mail_count",
+      "relative_to": "horde0_before_flying",
+      "equals": 0
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance1",
+      "metric": "mail_count",
+      "save_as": "alliance1_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance1",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance1: ground riding invitation remains available",
+      "actor": "alliance1",
+      "metric": "mail_count",
+      "relative_to": "alliance1_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance1",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance1",
+      "metric": "mail_count",
+      "save_as": "alliance1_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance1",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance1: flying invitation arrives with Outland access",
+      "actor": "alliance1",
+      "metric": "mail_count",
+      "relative_to": "alliance1_before_flying",
+      "equals": 1
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde1",
+      "metric": "mail_count",
+      "save_as": "horde1_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde1",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde1: ground riding invitation remains available",
+      "actor": "horde1",
+      "metric": "mail_count",
+      "relative_to": "horde1_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "horde1",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde1",
+      "metric": "mail_count",
+      "save_as": "horde1_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde1",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde1: flying invitation arrives with Outland access",
+      "actor": "horde1",
+      "metric": "mail_count",
+      "relative_to": "horde1_before_flying",
+      "equals": 1
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance2",
+      "metric": "mail_count",
+      "save_as": "alliance2_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance2",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance2: ground riding invitation remains available",
+      "actor": "alliance2",
+      "metric": "mail_count",
+      "relative_to": "alliance2_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance2",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alliance2",
+      "metric": "mail_count",
+      "save_as": "alliance2_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "alliance2",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "alliance2: flying invitation arrives with Outland access",
+      "actor": "alliance2",
+      "metric": "mail_count",
+      "relative_to": "alliance2_before_flying",
+      "equals": 1
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde2",
+      "metric": "mail_count",
+      "save_as": "horde2_before_riding"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde2",
+      "value": 20
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde2: ground riding invitation remains available",
+      "actor": "horde2",
+      "metric": "mail_count",
+      "relative_to": "horde2_before_riding",
+      "equals": 1
+    },
+    {
+      "action": "set_level",
+      "actor": "horde2",
+      "value": 59
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "horde2",
+      "metric": "mail_count",
+      "save_as": "horde2_before_flying"
+    },
+    {
+      "action": "set_level",
+      "actor": "horde2",
+      "value": 60
+    },
+    {
+      "action": "wait",
+      "label": "Allow mail delivery before asserting absence or presence",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "label": "horde2: flying invitation arrives with Outland access",
+      "actor": "horde2",
+      "metric": "mail_count",
+      "relative_to": "horde2_before_flying",
+      "equals": 1
+    }
+  ]
+}
