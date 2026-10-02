@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "necromancer-foul-invocation immunity refresh and removal",
-  "contract": "An active protection aura grants the native spell/mechanic/dispel immunity; refreshing that same aura must not create extra immunity applications. Native cancellation and natural expiry must leave no protection once the aura is absent. set_aura is explicit fixture setup and invokes the actual AddAura/SetStackAmount path. The spell_immune/spell_effect_immune metrics call real production immunity eligibility methods against authentic Spell.dbc probe records; this does not measure cast delivery or client rendering.",
+  "contract": "Refreshing or removing a protection aura must preserve source-counted immunity lifetimes.",
   "timeout_ms": 90000,
   "players": [
     {

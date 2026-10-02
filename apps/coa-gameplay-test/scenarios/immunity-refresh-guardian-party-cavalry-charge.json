@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Guardian Cavalry Charge tracks each party recipient",
-  "contract": "An active protection aura grants the native spell/mechanic/dispel immunity; refreshing that same aura must not create extra immunity applications. Native cancellation and natural expiry must leave no protection once the aura is absent. set_aura is explicit fixture setup and invokes the actual AddAura/SetStackAmount path. The spell_immune/spell_effect_immune metrics call real production immunity eligibility methods against authentic Spell.dbc probe records; this does not measure cast delivery or client rendering. Two grouped players receive the same caster-owned area aura. Each must acquire and relinquish its own root and snare immunity; tracking one flag for the shared AuraScript is insufficient.",
+  "contract": "Each party recipient gains and loses its own Cavalry Charge immunity.",
   "timeout_ms": 90000,
   "players": [
     {
