@@ -2388,6 +2388,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             }
 
             sScriptMgr->OnScaleAuraUnitAdd(this, target, effectMask, checkIfValid, implicit, m_auraScaleMask, *ihit);
+            if (ihit->positiveEffectsHit && !m_spellInfo->HasOnlyPositiveEffects(ihit->effectMask))
+                CalculateUnitTargetHit(target, *ihit);
             return;
         }
     }
@@ -2404,6 +2406,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     targetInfo.damageBeforeTakenMods = 0;
     targetInfo.crit       = false;
     targetInfo.scaleAura  = false;
+    targetInfo.positiveEffectsHit = false;
     if (m_auraScaleMask && targetInfo.effectMask == m_auraScaleMask && m_caster != target)
     {
         SpellInfo const* auraSpell = m_spellInfo->GetFirstRankSpell();
@@ -2413,10 +2416,18 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     sScriptMgr->OnScaleAuraUnitAdd(this, target, effectMask, checkIfValid, implicit, m_auraScaleMask, targetInfo);
 
+    CalculateUnitTargetHit(target, targetInfo);
+
+    // Add target to list
+    m_UniqueTargetInfo.push_back(targetInfo);
+}
+
+void Spell::CalculateUnitTargetHit(Unit* target, TargetInfo& targetInfo)
+{
     // Calculate hit result
     if (m_originalCaster)
     {
-        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, this, m_canReflect);
+        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, this, m_canReflect, targetInfo.effectMask);
         if (m_skipCheck && targetInfo.missCondition != SPELL_MISS_IMMUNE)
         {
             targetInfo.missCondition = SPELL_MISS_NONE;
@@ -2424,6 +2435,10 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     }
     else
         targetInfo.missCondition = SPELL_MISS_EVADE; //SPELL_MISS_NONE;
+
+    targetInfo.positiveEffectsHit = targetInfo.missCondition == SPELL_MISS_NONE && m_originalCaster &&
+        !m_spellInfo->IsPositive() && !m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL) &&
+        !m_originalCaster->IsHostileTo(target) && m_spellInfo->HasOnlyPositiveEffects(targetInfo.effectMask);
 
     // Spell have speed - need calculate incoming time
     // Incoming time is zero for self casts. At least I think so.
@@ -2454,7 +2469,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             targetInfo.reflectResult = SPELL_MISS_PARRY;
 
         // Increase time interval for reflected spells by 1.5
-        m_caster->m_Events.AddEventAtOffset(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo), Milliseconds(targetInfo.timeDelay));
+        m_caster->m_Events.AddEventAtOffset(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo),
+            Milliseconds(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
 
         m_spellFlags |= SPELL_FLAG_REFLECTED;
@@ -2479,8 +2495,6 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
 
-    // Add target to list
-    m_UniqueTargetInfo.push_back(targetInfo);
 }
 
 void Spell::AddGOTarget(GameObject* go, uint32 effectMask)

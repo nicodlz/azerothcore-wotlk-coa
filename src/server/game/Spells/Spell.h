@@ -276,6 +276,7 @@ struct TargetInfo
     bool   alive:1;
     bool   crit:1;
     bool   scaleAura:1;
+    bool   positiveEffectsHit:1;
     int32  damage;
     int32  damageBeforeTakenMods;
 };
@@ -783,6 +784,7 @@ public:
     SpellDestination m_destTargets[MAX_SPELL_EFFECTS];
 
     void AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid = true, bool implicit = true);
+    void CalculateUnitTargetHit(Unit* target, TargetInfo& targetInfo);
     void AddGOTarget(GameObject* target, uint32 effectMask);
     void AddItemTarget(Item* item, uint32 effectMask);
     void AddDestTarget(SpellDestination const& dest, uint32 effIndex);

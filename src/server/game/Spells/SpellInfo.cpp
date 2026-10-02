@@ -1387,6 +1387,18 @@ bool SpellInfo::IsPositive() const
     return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE) || (AttributesCu & SPELL_ATTR0_CU_POSITIVE);
 }
 
+bool SpellInfo::HasOnlyPositiveEffects(uint32 effectMask) const
+{
+    if (!effectMask || (effectMask & ~MAX_EFFECT_MASK))
+        return false;
+
+    for (uint8 effect = EFFECT_0; effect < MAX_SPELL_EFFECTS; ++effect)
+        if ((effectMask & (1u << effect)) && !IsPositiveEffect(effect))
+            return false;
+
+    return true;
+}
+
 bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
 {
     switch (effIndex)

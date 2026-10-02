@@ -3993,7 +3993,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
     return SPELL_MISS_NONE;
 }
 
-SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanReflect)
+SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanReflect, uint32 effectMask)
 {
     SpellInfo const* spellInfo = spell->GetSpellInfo();
 
@@ -4005,7 +4005,8 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanRef
 
     // All positive spells can`t miss
     /// @todo: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if ((spellInfo->IsPositive() || spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
+    if ((spellInfo->IsPositive() || spellInfo->HasOnlyPositiveEffects(effectMask) ||
+        spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
         && (!IsHostileTo(victim))) // prevent from affecting enemy by "positive" spell
     {
         return SPELL_MISS_NONE;

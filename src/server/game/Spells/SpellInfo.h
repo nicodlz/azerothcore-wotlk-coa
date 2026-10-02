@@ -501,6 +501,7 @@ public:
     bool CanBeUsedInCombat() const;
     bool IsPositive() const;
     bool IsPositiveEffect(uint8 effIndex) const;
+    bool HasOnlyPositiveEffects(uint32 effectMask) const;
     bool IsChanneled() const;
     [[nodiscard]] bool IsActionAllowedChannel() const;
     bool NeedsComboPoints() const;
