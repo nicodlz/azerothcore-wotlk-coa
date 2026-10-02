@@ -11,7 +11,25 @@
       "level": 60
     },
     {
-      "id": "mate",
+      "id": "mate_a",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    },
+    {
+      "id": "mate_b",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    },
+    {
+      "id": "mate_c",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    },
+    {
+      "id": "mate_d",
       "race": 1,
       "class": 1,
       "level": 60
@@ -27,9 +45,30 @@
   "steps": [
     {
       "action": "group",
-      "label": "Form one party before entering the instance",
+      "label": "Form one five-player party before entering the instance",
       "actor": "opener",
-      "target": "mate",
+      "target": "mate_a",
+      "loot_method": 0
+    },
+    {
+      "action": "group",
+      "label": "Form one five-player party before entering the instance",
+      "actor": "opener",
+      "target": "mate_b",
+      "loot_method": 0
+    },
+    {
+      "action": "group",
+      "label": "Form one five-player party before entering the instance",
+      "actor": "opener",
+      "target": "mate_c",
+      "loot_method": 0
+    },
+    {
+      "action": "group",
+      "label": "Form one five-player party before entering the instance",
+      "actor": "opener",
+      "target": "mate_d",
       "loot_method": 0
     },
     {
@@ -43,24 +82,8 @@
       "o": 0
     },
     {
-      "action": "teleport",
-      "label": "Enter the same party dungeon",
-      "actor": "mate",
-      "map": 209,
-      "x": 1890.12,
-      "y": 989.759,
-      "z": 8.87679,
-      "o": 0
-    },
-    {
       "action": "set_health",
       "actor": "opener",
-      "maximum": 1000000,
-      "value": 1000000
-    },
-    {
-      "action": "set_health",
-      "actor": "mate",
       "maximum": 1000000,
       "value": 1000000
     },
@@ -85,22 +108,146 @@
       "equals": 0
     },
     {
+      "action": "teleport",
+      "label": "Enter the same party dungeon",
+      "actor": "mate_a",
+      "map": 209,
+      "x": 1890.12,
+      "y": 989.759,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "mate_a",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
       "action": "set_phase",
-      "actor": "mate",
+      "actor": "mate_a",
       "value": 1
     },
     {
       "action": "learn",
-      "actor": "mate",
+      "actor": "mate_a",
       "spell": 6247
     },
     {
       "action": "fill_bags",
-      "actor": "mate"
+      "actor": "mate_a"
     },
     {
       "action": "assert",
-      "actor": "mate",
+      "actor": "mate_a",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "teleport",
+      "label": "Enter the same party dungeon",
+      "actor": "mate_b",
+      "map": 209,
+      "x": 1890.12,
+      "y": 989.759,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "mate_b",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
+      "action": "set_phase",
+      "actor": "mate_b",
+      "value": 1
+    },
+    {
+      "action": "learn",
+      "actor": "mate_b",
+      "spell": 6247
+    },
+    {
+      "action": "fill_bags",
+      "actor": "mate_b"
+    },
+    {
+      "action": "assert",
+      "actor": "mate_b",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "teleport",
+      "label": "Enter the same party dungeon",
+      "actor": "mate_c",
+      "map": 209,
+      "x": 1890.12,
+      "y": 989.759,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "mate_c",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
+      "action": "set_phase",
+      "actor": "mate_c",
+      "value": 1
+    },
+    {
+      "action": "learn",
+      "actor": "mate_c",
+      "spell": 6247
+    },
+    {
+      "action": "fill_bags",
+      "actor": "mate_c"
+    },
+    {
+      "action": "assert",
+      "actor": "mate_c",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "teleport",
+      "label": "Enter the same party dungeon",
+      "actor": "mate_d",
+      "map": 209,
+      "x": 1890.12,
+      "y": 989.759,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "set_health",
+      "actor": "mate_d",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
+      "action": "set_phase",
+      "actor": "mate_d",
+      "value": 1
+    },
+    {
+      "action": "learn",
+      "actor": "mate_d",
+      "spell": 6247
+    },
+    {
+      "action": "fill_bags",
+      "actor": "mate_d"
+    },
+    {
+      "action": "assert",
+      "actor": "mate_d",
       "metric": "free_inventory_slots",
       "equals": 0
     },
@@ -110,9 +257,33 @@
     },
     {
       "action": "assert",
-      "label": "Both players see one another in the same dungeon instance",
+      "label": "The party shares one dungeon instance and phase",
       "actor": "opener",
-      "target": "mate",
+      "target": "mate_a",
+      "metric": "can_detect",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "The party shares one dungeon instance and phase",
+      "actor": "opener",
+      "target": "mate_b",
+      "metric": "can_detect",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "The party shares one dungeon instance and phase",
+      "actor": "opener",
+      "target": "mate_c",
+      "metric": "can_detect",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "The party shares one dungeon instance and phase",
+      "actor": "opener",
+      "target": "mate_d",
       "metric": "can_detect",
       "equals": 1
     },
@@ -146,7 +317,7 @@
     },
     {
       "action": "cast",
-      "actor": "mate",
+      "actor": "mate_a",
       "spell": 6247,
       "target_gameobject": 128403
     },
@@ -166,7 +337,7 @@
     },
     {
       "action": "cast",
-      "actor": "opener",
+      "actor": "mate_b",
       "spell": 6247,
       "target_gameobject": 128403
     },
@@ -186,7 +357,7 @@
     },
     {
       "action": "cast",
-      "actor": "mate",
+      "actor": "mate_c",
       "spell": 6247,
       "target_gameobject": 128403
     },
@@ -206,7 +377,7 @@
     },
     {
       "action": "cast",
-      "actor": "opener",
+      "actor": "mate_d",
       "spell": 6247,
       "target_gameobject": 128403
     },
@@ -227,15 +398,6 @@
     {
       "action": "teleport",
       "actor": "opener",
-      "map": 209,
-      "x": 1876.14,
-      "y": 976.482,
-      "z": 9.05195,
-      "o": 0
-    },
-    {
-      "action": "teleport",
-      "actor": "mate",
       "map": 209,
       "x": 1876.14,
       "y": 976.482,
