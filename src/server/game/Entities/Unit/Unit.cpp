@@ -97,6 +97,8 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
     3.14f                  // MOVE_PITCH_RATE
 };
 
+std::array<float, MAX_MOVE_TYPE> const defaultBaseMoveSpeed = std::to_array(baseMoveSpeed);
+
 float playerBaseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                  // MOVE_WALK

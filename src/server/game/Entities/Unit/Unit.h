@@ -32,6 +32,7 @@
 #include "UnitDefines.h"
 #include "UnitUtils.h"
 #include <boost/container/flat_map.hpp>
+#include <array>
 #include <functional>
 #include <optional>
 #include <utility>
@@ -209,6 +210,7 @@ enum class DeathState : uint8
     JustRespawned = 4,
 };
 
+extern std::array<float, MAX_MOVE_TYPE> const defaultBaseMoveSpeed;
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
