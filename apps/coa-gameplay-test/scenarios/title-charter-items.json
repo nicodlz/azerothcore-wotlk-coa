@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "name": "Title charters grant their promised titles once without wasting duplicates",
+  "contract": "Item tooltips promise Founder for 977020 and legacy 134988, Bloody for 977220, and The Godslayer for 1777010. CharTitles.dbc names those titles at ids 210, 230 and 180. Using a charter grants the matching title and consumes one item. An already-earned title leaves its duplicate charter available.",
+  "timeout_ms": 30000,
+  "players": [
+    {
+      "id": "founder",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    },
+    {
+      "id": "legacy",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    },
+    {
+      "id": "bloody",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    },
+    {
+      "id": "godslayer",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "add_item",
+      "actor": "founder",
+      "item": 977020,
+      "count": 2
+    },
+    {
+      "action": "use_item",
+      "actor": "founder",
+      "item": 977020,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "founder",
+      "metric": "has_title",
+      "title": 210,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "founder",
+      "metric": "item_count",
+      "item": 977020,
+      "equals": 1
+    },
+    {
+      "action": "use_item",
+      "actor": "founder",
+      "item": 977020,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "founder",
+      "metric": "item_count",
+      "item": 977020,
+      "equals": 1
+    },
+    {
+      "action": "add_item",
+      "actor": "legacy",
+      "item": 134988,
+      "count": 2
+    },
+    {
+      "action": "use_item",
+      "actor": "legacy",
+      "item": 134988,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "legacy",
+      "metric": "has_title",
+      "title": 210,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "legacy",
+      "metric": "item_count",
+      "item": 134988,
+      "equals": 1
+    },
+    {
+      "action": "use_item",
+      "actor": "legacy",
+      "item": 134988,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "legacy",
+      "metric": "item_count",
+      "item": 134988,
+      "equals": 1
+    },
+    {
+      "action": "add_item",
+      "actor": "bloody",
+      "item": 977220,
+      "count": 2
+    },
+    {
+      "action": "use_item",
+      "actor": "bloody",
+      "item": 977220,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "bloody",
+      "metric": "has_title",
+      "title": 230,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "bloody",
+      "metric": "item_count",
+      "item": 977220,
+      "equals": 1
+    },
+    {
+      "action": "use_item",
+      "actor": "bloody",
+      "item": 977220,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "bloody",
+      "metric": "item_count",
+      "item": 977220,
+      "equals": 1
+    },
+    {
+      "action": "add_item",
+      "actor": "godslayer",
+      "item": 1777010,
+      "count": 2
+    },
+    {
+      "action": "use_item",
+      "actor": "godslayer",
+      "item": 1777010,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "godslayer",
+      "metric": "has_title",
+      "title": 180,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "godslayer",
+      "metric": "item_count",
+      "item": 1777010,
+      "equals": 1
+    },
+    {
+      "action": "use_item",
+      "actor": "godslayer",
+      "item": 1777010,
+      "spell": 18282
+    },
+    {
+      "action": "assert",
+      "actor": "godslayer",
+      "metric": "item_count",
+      "item": 1777010,
+      "equals": 1
+    }
+  ]
+}
