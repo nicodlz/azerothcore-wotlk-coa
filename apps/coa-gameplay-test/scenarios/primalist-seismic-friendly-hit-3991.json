@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Primalist Seismic Wave heals higher-level allies 3991",
-  "contract": "Regression for report #3991. Authentic Spell.dbc 805462 heals allies (effect 0, target 31) and damages enemies (effect 1, target 16). Healing a friendly target must not depend on its level or offensive spell hit rating. Ten ordinary Seismic Wave casts from a level-16 Primalist must each record a native healing event on the level-80 ally. A level-16 ally and ordinary pure Flash Heal 2061 to the level-80 ally control selection and friendly healing. The level-80 enemy remains subject to the original offensive hit roll: at most five damage events across ten casts; with the core 1-percent minimum hit chance the accidental failure probability is below 3e-10. No random state or hit stats are changed. Cooldowns and rage are restored between casts as fixtures; recharge behavior is outside this regression. Native event counts and completed casts exclude passive health regeneration and cast submission failures.",
+  "contract": "Seismic Wave heals higher-level allies while preserving offensive miss rolls.",
   "players": [
     {
       "id": "primalist",

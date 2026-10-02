@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Friendly selected-effect union and immunity hit controls 3991",
-  "contract": "Core-selection regression using the authentic client test record 999977, not a claim of player acquisition or normal auto-repeat casting. A never-cast native Spell receives ally target effects through AddUnitTargetForScript in both orders. Effect 0 heals, effect 1 damages; both target an explicit ally. At level16 versus level80 the mixed final target must retain an offensive miss roll; no more than ten NONE results among64 native attempts, with accidental threshold failure below1e-10 for a1-percent hit floor. Positive-only selection must have64 NONE results. DivineShield642 provides a native whole-spell school immunity control, checked before any positive-effect hit bypass. The probe rejects reflectable spell records before target selection, does not alter hit statistics or seed random state, and never submits a cast. The separate SeismicWave scenario covers ordinary casts and real healing events.",
+  "contract": "Native selected-effect masks preserve mixed-spell miss rolls and school immunity.",
   "players": [
     {
       "id": "primalist",
