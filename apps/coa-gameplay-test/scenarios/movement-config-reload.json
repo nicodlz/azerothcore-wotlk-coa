@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "name": "Movement config reload preserves independent player and NPC base speeds",
+  "contract": "Rate.MoveSpeed.Player and Rate.MoveSpeed.NPC independently multiply the canonical run speed of 7 yards/sec. Reloading identical configuration twice must not multiply either speed again. Run the discriminating before/after comparison with AC_RATE_MOVE_SPEED_PLAYER=1 and AC_RATE_MOVE_SPEED_NPC=2; also run player=2,NPC=0.5 and the default 1/1 controls. Both rates must be positive. Observations call Unit::GetSpeed, not GetSpeedRate, on an ordinary player and an uncontrolled creature. No mounted, pet-controlled or rendered-client packet behavior is asserted.",
+  "players": [
+    {
+      "id": "player",
+      "race": 1,
+      "class": 1,
+      "level": 20
+    }
+  ],
+  "creatures": [
+    {
+      "id": "npc",
+      "entry": 36,
+      "reaction": "passive"
+    }
+  ],
+  "steps": [
+    {
+      "action": "snapshot",
+      "actor": "player",
+      "metric": "run_speed_config_rate",
+      "save_as": "player_config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed",
+      "ratio_to": "player_config",
+      "min": 6.9999,
+      "max": 7.0001
+    },
+    {
+      "action": "snapshot",
+      "actor": "player",
+      "metric": "run_speed",
+      "save_as": "player_initial"
+    },
+    {
+      "action": "snapshot",
+      "actor": "npc",
+      "metric": "run_speed_config_rate",
+      "save_as": "npc_config"
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed",
+      "ratio_to": "npc_config",
+      "min": 6.9999,
+      "max": 7.0001
+    },
+    {
+      "action": "snapshot",
+      "actor": "npc",
+      "metric": "run_speed",
+      "save_as": "npc_initial"
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed",
+      "relative_to": "player_initial",
+      "min": -0.0001,
+      "max": 0.0001
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed",
+      "ratio_to": "player_config",
+      "min": 6.9999,
+      "max": 7.0001
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed",
+      "relative_to": "npc_initial",
+      "min": -0.0001,
+      "max": 0.0001
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed",
+      "ratio_to": "npc_config",
+      "min": 6.9999,
+      "max": 7.0001
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed",
+      "relative_to": "player_initial",
+      "min": -0.0001,
+      "max": 0.0001
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed",
+      "ratio_to": "player_config",
+      "min": 6.9999,
+      "max": 7.0001
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed",
+      "relative_to": "npc_initial",
+      "min": -0.0001,
+      "max": 0.0001
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed",
+      "ratio_to": "npc_config",
+      "min": 6.9999,
+      "max": 7.0001
+    }
+  ]
+}

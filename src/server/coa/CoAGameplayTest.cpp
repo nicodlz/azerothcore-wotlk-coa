@@ -1686,6 +1686,10 @@ private:
             Require(hand < MAX_ATTACK, "Invalid attack hand");
             return unit->GetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + hand);
         }
+        if (metric == "run_speed")
+            return unit->GetSpeed(MOVE_RUN);
+        if (metric == "run_speed_config_rate")
+            return sWorld->getRate(unit->IsControlledByPlayer() ? RATE_MOVESPEED_PLAYER : RATE_MOVESPEED_NPC);
         if (metric == "run_speed_rate")
             return unit->GetSpeedRate(MOVE_RUN);
         if (metric == "spell_hit_bonus_taken")
