@@ -709,6 +709,11 @@ before a player update, then leaves subsequent assertions to verify the queued c
 It tests dispatch and deferral, not a real socket, packet delivery, or every possible concurrent schedule.
 
 `view_level` takes a player `actor` and unit `target` and queries the target-relative combat level.
+`resting` reads the player's native rest flag. `mana_regen_rate` reads the player's mana regeneration rate
+field, with `effect: 0` for uninterrupted regeneration and `effect: 1` for interrupted regeneration.
+`sent_mana_regen_rate` decodes that FLOAT field from the player's observed values-only object updates;
+it fails when no update carried the field. These rates describe server fields and emitted packets,
+while `power` measures actual mana. They do not inspect client interpolation or rendering.
 `sent_level` and `sent_max_health` use the same fields and observe values-only object updates emitted to
 the socketless session. They return zero until the corresponding field has been observed; they do not
 force updates or inspect client rendering. `lfg_dungeon_disabled` takes an LFGDungeons.dbc `dungeon` id and

@@ -67,6 +67,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -1615,6 +1616,31 @@ private:
         }
         if (metric == "level")
             return unit->GetLevel();
+        if (metric == "resting")
+        {
+            Require(unit->IsPlayer(), "Resting metric needs a player");
+            return unit->ToPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING);
+        }
+        if (metric == "mana_regen_rate" || metric == "sent_mana_regen_rate")
+        {
+            Require(unit->IsPlayer(), "Mana regeneration metric needs a player");
+            uint32 const effect = step.get<uint32>("effect", 0);
+            Require(effect <= 1, "Mana regeneration effect must be 0 or 1");
+            uint16 const field = effect ? UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER :
+                UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER;
+            if (metric == "mana_regen_rate")
+                return unit->GetFloatValue(field);
+            Actor& actor = _actors.at(step.get<std::string>("actor"));
+            auto const values = actor.unitValues.find(unit->GetGUID().GetRawValue());
+            Require(values != actor.unitValues.end() && values->second.count(field),
+                "Mana regeneration field has not been observed in an object update");
+            uint32 const encoded = values->second.at(field);
+            float rate;
+            static_assert(sizeof(rate) == sizeof(encoded));
+            std::memcpy(&rate, &encoded, sizeof(rate));
+            Require(std::isfinite(rate), "Observed mana regeneration rate is nonfinite");
+            return rate;
+        }
         if (metric == "lfg_dungeon_disabled")
         {
             lfg::LFGDungeonData const* dungeon = sLFGMgr->GetLFGDungeon(step.get<uint32>("dungeon"));
