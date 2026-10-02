@@ -207,6 +207,12 @@ bool OpenPrestigiousCache(Player* player, Item* item)
         return true;
     }
 
+    if (item->GetEntry() == GenericCacheAll)
+    {
+        AscensionCacheRewards::Deliver(player, {{ cacheItemId, 0, 0, 0 }}, item);
+        return true;
+    }
+
     AscensionCacheRewards::Reward reward;
     if (!PickReward(player, *pool, reward))
     {

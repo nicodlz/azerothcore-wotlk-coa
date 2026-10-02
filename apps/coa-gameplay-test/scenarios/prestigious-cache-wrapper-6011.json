@@ -1,0 +1,257 @@
+{
+  "schema": 1,
+  "name": "Generic Prestigious Cache grants the latest released named cache (#6011)",
+  "contract": "Prestigious Cache 1287330 promises: Grants the most recent Prestigious Cache available. With Ascension.PrestigiousCache.ClassicStages=8 and TbcStages=0, the newest populated Classic tier is Naxxramas1287311. The wrapper must grant exactly one unopened named cache and no gear or tokens. Native CMSG_OPEN_ITEM activates the wrapper. The named cache retains its own gear payout. With full bags, the existing delivery service must mail exactly one unopened named cache before consuming the wrapper.",
+  "timeout_ms": 30000,
+  "players": [
+    {
+      "id": "control",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    },
+    {
+      "id": "opener",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    },
+    {
+      "id": "stuffed",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    }
+  ],
+  "steps": [
+    {
+      "action": "add_item",
+      "actor": "control",
+      "item": 1287311
+    },
+    {
+      "action": "snapshot",
+      "actor": "control",
+      "metric": "carried_pool_item_count",
+      "table": "prestigious",
+      "cache": 1287311,
+      "save_as": "control_pool"
+    },
+    {
+      "action": "use_item",
+      "actor": "control",
+      "item": 1287311,
+      "spell": 93461
+    },
+    {
+      "action": "assert",
+      "actor": "control",
+      "metric": "item_count",
+      "within_ms": 2000,
+      "item": 1287311,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "control",
+      "metric": "carried_pool_item_count",
+      "within_ms": 2000,
+      "table": "prestigious",
+      "cache": 1287311,
+      "relative_to": "control_pool",
+      "min": 1,
+      "max": 3
+    },
+    {
+      "action": "add_item",
+      "actor": "opener",
+      "item": 1287330
+    },
+    {
+      "action": "snapshot",
+      "actor": "opener",
+      "metric": "carried_item_count",
+      "save_as": "opener_carried_item_count"
+    },
+    {
+      "action": "snapshot",
+      "actor": "opener",
+      "metric": "mail_item_count",
+      "save_as": "opener_mail_item_count"
+    },
+    {
+      "action": "snapshot",
+      "actor": "opener",
+      "metric": "carried_pool_item_count",
+      "save_as": "opener_carried_pool_item_count",
+      "table": "prestigious",
+      "cache": 1287311
+    },
+    {
+      "action": "snapshot",
+      "actor": "opener",
+      "metric": "mail_pool_item_count",
+      "save_as": "opener_mail_pool_item_count",
+      "table": "prestigious",
+      "cache": 1287311
+    },
+    {
+      "action": "open_item",
+      "actor": "opener",
+      "item": 1287330
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "item_count",
+      "within_ms": 2000,
+      "item": 1287330,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "carried_pool_item_count",
+      "within_ms": 2000,
+      "table": "prestigious",
+      "cache": 1287311,
+      "relative_to": "opener_carried_pool_item_count",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "mail_pool_item_count",
+      "within_ms": 2000,
+      "table": "prestigious",
+      "cache": 1287311,
+      "relative_to": "opener_mail_pool_item_count",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "item_count",
+      "within_ms": 2000,
+      "item": 1287311,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "carried_item_count",
+      "within_ms": 2000,
+      "relative_to": "opener_carried_item_count",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "mail_item_count",
+      "within_ms": 2000,
+      "relative_to": "opener_mail_item_count",
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "stuffed",
+      "item": 1287330
+    },
+    {
+      "action": "fill_bags",
+      "actor": "stuffed"
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "free_inventory_slots",
+      "within_ms": 2000,
+      "equals": 0
+    },
+    {
+      "action": "snapshot",
+      "actor": "stuffed",
+      "metric": "carried_item_count",
+      "save_as": "stuffed_carried_item_count"
+    },
+    {
+      "action": "snapshot",
+      "actor": "stuffed",
+      "metric": "mail_item_count",
+      "save_as": "stuffed_mail_item_count"
+    },
+    {
+      "action": "snapshot",
+      "actor": "stuffed",
+      "metric": "carried_pool_item_count",
+      "save_as": "stuffed_carried_pool_item_count",
+      "table": "prestigious",
+      "cache": 1287311
+    },
+    {
+      "action": "snapshot",
+      "actor": "stuffed",
+      "metric": "mail_pool_item_count",
+      "save_as": "stuffed_mail_pool_item_count",
+      "table": "prestigious",
+      "cache": 1287311
+    },
+    {
+      "action": "open_item",
+      "actor": "stuffed",
+      "item": 1287330
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "item_count",
+      "within_ms": 2000,
+      "item": 1287330,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "carried_pool_item_count",
+      "within_ms": 2000,
+      "table": "prestigious",
+      "cache": 1287311,
+      "relative_to": "stuffed_carried_pool_item_count",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "mail_pool_item_count",
+      "within_ms": 2000,
+      "table": "prestigious",
+      "cache": 1287311,
+      "relative_to": "stuffed_mail_pool_item_count",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "mail_has_item",
+      "within_ms": 2000,
+      "item": 1287311,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "mail_item_count",
+      "within_ms": 2000,
+      "relative_to": "stuffed_mail_item_count",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "stuffed",
+      "metric": "carried_item_count",
+      "within_ms": 2000,
+      "relative_to": "stuffed_carried_item_count",
+      "equals": -1
+    }
+  ]
+}
