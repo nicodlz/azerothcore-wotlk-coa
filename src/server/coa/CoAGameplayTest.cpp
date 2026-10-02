@@ -1951,6 +1951,29 @@ private:
                         ++count;
             return count;
         }
+        if (metric == "gameobject_loot_item_count_mismatches")
+        {
+            uint32 const lootId = step.get<uint32>("entry");
+            uint32 const itemId = step.get<uint32>("item");
+            uint32 const expectedCount = step.get<uint32>("count");
+            uint32 const rolls = step.get<uint32>("rolls", 256);
+            Require(LootTemplates_Gameobject.HaveLootFor(lootId), "Unknown gameobject loot template");
+            Require(sObjectMgr->GetItemTemplate(itemId) != nullptr, "Unknown loot item");
+            Require(rolls > 0 && rolls <= 10000, "Loot sampling needs 1..10000 rolls");
+            uint32 mismatches = 0;
+            for (uint32 roll = 0; roll < rolls; ++roll)
+            {
+                Loot loot;
+                Require(loot.FillLoot(lootId, LootTemplates_Gameobject, player, true, true),
+                    "Gameobject loot generation failed");
+                uint32 count = 0;
+                for (LootItem const& item : loot.items)
+                    if (item.itemid == itemId)
+                        count += item.count;
+                mismatches += count != expectedCount;
+            }
+            return mismatches;
+        }
         if (metric == "creature_loot_quality_rate")
         {
             uint32 const lootId = step.get<uint32>("entry");

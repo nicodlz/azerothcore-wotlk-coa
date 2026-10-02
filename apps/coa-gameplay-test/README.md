@@ -620,6 +620,11 @@ quantity reached inventory and records the item/count. It supports ordinary cont
 reports the inventory increase from its last successful `collect_loot`. Closed windows return zero slots/entry.
 `creature_loot_quality_rate` requires `entry` (a creature loot id), fills that template `rolls` times (default 10000)
 for the actor and reports the percentage of fills holding an item of at least `quality` (default 3, rare).
+`gameobject_loot_item_count_mismatches` requires `entry` (a gameobject loot id), `item` and `count`.
+It fills the native template `rolls` times (default 256, maximum 10000), sums the specified item's quantities
+in each fill and returns how many fills differ from `count`. Fixed-count templates have deterministic results;
+variable-count templates are sampled rather than proven by a single roll. This does not exercise a boss kill,
+cache spawning, the loot window or group distribution.
 `quest_rewarded` requires `quest` and reads the player's native rewarded status.
 `has_achievement` requires `achievement` and reads whether the player has completed it.
 `has_title` requires `title` (a CharTitles.dbc id) and reads whether the player has earned it.
