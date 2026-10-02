@@ -1,0 +1,342 @@
+{
+  "schema": 1,
+  "name": "Profession hats halve the matching gathering or crafting cast time (#4824)",
+  "contract": [
+    "#4824 reports profession hats failing to speed gathering/crafting. This covers two of its eleven items:",
+    "Herbalist's Hat 1004000 and Alchemist's Hat 1004003. Their effective item_template rows grant equip-trigger",
+    "spells of the same IDs. Original CoA Spell.dbc describes faster gathering/alchemy and defines -50% casting-",
+    "time modifiers: aura108, op10, BasePoints-51 plus DieSides1. Original SpellAffect.dbc row18061 pairs 1004000",
+    "with Herb Gathering2366; row37039 pairs 1004003 with Minor Healing Potion2330. Crossed pairs are absent.",
+    "Both target spells use SpellCastTimes row14, 3000ms. The manifest agrees with the extracted files: Spell.dbc",
+    "SHA256 d3dd607291d2d6793f72c7b13537f94fd7748d40a79a326db6a8b4cb2ed41068 from patch-T.MPQ.ORIGINAL;",
+    "SpellAffect.dbc SHA256 bddf0363c94558a8564681224a8c3e0e359d9eef4b5ba450b7a7a215e9cf02be from patch-S.MPQ.",
+    "Its reviewed native layout is SpellAffectEntry/SpellAffectfmt nii. AscensionProfessionSpellAffect already",
+    "routes these pairs through the native modifier check, so this is a regression of working behavior with no",
+    "gameplay fix. Ordinary-security level20 Warrior actors learn Apprentice Herbalism/Alchemy and the recipe as",
+    "fixtures, with skills1/75. Real hats are granted and equipped through the native handler. The test checks",
+    "the equip aura and server CalcCastTime: matching duration halves, crossed profession stays unchanged, native",
+    "destruction clears the aura and restores both durations. Item granting is fixture acquisition, not a",
+    "Bazaar/vendor test. This does not measure cast completion, gather yields, crafted items, client tooltips or",
+    "rendered cast bars. The other nine reported hats remain outside this scenario."
+  ],
+  "timeout_ms": 60000,
+  "location": {
+    "map": 0,
+    "x": -9200,
+    "y": -1700,
+    "z": 258.915,
+    "o": 0
+  },
+  "players": [
+    {
+      "id": "herbalist",
+      "race": 1,
+      "class": 1,
+      "level": 20
+    },
+    {
+      "id": "alchemist",
+      "race": 1,
+      "class": 1,
+      "level": 20
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "learn",
+      "actor": "herbalist",
+      "spell": 2366
+    },
+    {
+      "action": "learn",
+      "actor": "herbalist",
+      "spell": 2259
+    },
+    {
+      "action": "learn",
+      "actor": "herbalist",
+      "spell": 2330
+    },
+    {
+      "action": "set_skill",
+      "actor": "herbalist",
+      "skill": 182,
+      "value": 1,
+      "maximum": 75
+    },
+    {
+      "action": "set_skill",
+      "actor": "herbalist",
+      "skill": 171,
+      "value": 1,
+      "maximum": 75
+    },
+    {
+      "action": "assert",
+      "label": "Unbuffed profession uses the original 3000 ms cast time",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "equals": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "save_as": "herbalist_2366_base"
+    },
+    {
+      "action": "assert",
+      "label": "Unbuffed profession uses the original 3000 ms cast time",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "equals": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "save_as": "herbalist_2330_base"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: hat aura absent before equipment",
+      "actor": "herbalist",
+      "metric": "aura",
+      "spell": 1004000,
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "herbalist",
+      "item": 1004000
+    },
+    {
+      "action": "equip",
+      "actor": "herbalist",
+      "item": 1004000,
+      "slot": 0
+    },
+    {
+      "action": "assert",
+      "label": "The equipped real hat applies its aura",
+      "actor": "herbalist",
+      "metric": "aura",
+      "spell": 1004000,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Matching profession cast time is halved",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "ratio_to": "herbalist_2366_base",
+      "equals": 0.5
+    },
+    {
+      "action": "assert",
+      "label": "Crossed profession cast time stays unchanged",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "ratio_to": "herbalist_2330_base",
+      "equals": 1
+    },
+    {
+      "action": "destroy_item",
+      "label": "Remove the real equipped hat through CMSG_DESTROYITEM",
+      "actor": "herbalist",
+      "item": 1004000
+    },
+    {
+      "action": "assert",
+      "label": "The destroyed hat is gone",
+      "actor": "herbalist",
+      "metric": "item_count",
+      "item": 1004000,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Equip aura clears when the hat is removed",
+      "actor": "herbalist",
+      "metric": "aura",
+      "spell": 1004000,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Both profession cast times return to their original values",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "ratio_to": "herbalist_2366_base",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "Both profession cast times return to their original values",
+      "actor": "herbalist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "ratio_to": "herbalist_2330_base",
+      "equals": 1
+    },
+    {
+      "action": "learn",
+      "actor": "alchemist",
+      "spell": 2366
+    },
+    {
+      "action": "learn",
+      "actor": "alchemist",
+      "spell": 2259
+    },
+    {
+      "action": "learn",
+      "actor": "alchemist",
+      "spell": 2330
+    },
+    {
+      "action": "set_skill",
+      "actor": "alchemist",
+      "skill": 182,
+      "value": 1,
+      "maximum": 75
+    },
+    {
+      "action": "set_skill",
+      "actor": "alchemist",
+      "skill": 171,
+      "value": 1,
+      "maximum": 75
+    },
+    {
+      "action": "assert",
+      "label": "Unbuffed profession uses the original 3000 ms cast time",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "equals": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "save_as": "alchemist_2330_base"
+    },
+    {
+      "action": "assert",
+      "label": "Unbuffed profession uses the original 3000 ms cast time",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "equals": 3000
+    },
+    {
+      "action": "snapshot",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "save_as": "alchemist_2366_base"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: hat aura absent before equipment",
+      "actor": "alchemist",
+      "metric": "aura",
+      "spell": 1004003,
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "alchemist",
+      "item": 1004003
+    },
+    {
+      "action": "equip",
+      "actor": "alchemist",
+      "item": 1004003,
+      "slot": 0
+    },
+    {
+      "action": "assert",
+      "label": "The equipped real hat applies its aura",
+      "actor": "alchemist",
+      "metric": "aura",
+      "spell": 1004003,
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Matching profession cast time is halved",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "ratio_to": "alchemist_2330_base",
+      "equals": 0.5
+    },
+    {
+      "action": "assert",
+      "label": "Crossed profession cast time stays unchanged",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "ratio_to": "alchemist_2366_base",
+      "equals": 1
+    },
+    {
+      "action": "destroy_item",
+      "label": "Remove the real equipped hat through CMSG_DESTROYITEM",
+      "actor": "alchemist",
+      "item": 1004003
+    },
+    {
+      "action": "assert",
+      "label": "The destroyed hat is gone",
+      "actor": "alchemist",
+      "metric": "item_count",
+      "item": 1004003,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Equip aura clears when the hat is removed",
+      "actor": "alchemist",
+      "metric": "aura",
+      "spell": 1004003,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Both profession cast times return to their original values",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2330,
+      "ratio_to": "alchemist_2330_base",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "label": "Both profession cast times return to their original values",
+      "actor": "alchemist",
+      "metric": "spell_cast_time_ms",
+      "spell": 2366,
+      "ratio_to": "alchemist_2366_base",
+      "equals": 1
+    }
+  ]
+}
