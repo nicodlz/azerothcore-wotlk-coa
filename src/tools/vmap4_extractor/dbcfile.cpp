@@ -39,7 +39,8 @@ bool DBCFile::open()
     unsigned char header[4];
     unsigned int na, nb, es, ss;
 
-    f.read(header, 4); // File Header
+    if (f.read(header, 4) != 4) // File Header
+        return false;
 
     if (header[0] != 'W' || header[1] != 'D' || header[2] != 'B' || header[3] != 'C')
     {
@@ -51,10 +52,14 @@ bool DBCFile::open()
 
     //assert(header[0]=='W' && header[1]=='D' && header[2]=='B' && header[3] == 'C');
 
-    f.read(&na, 4); // Number of records
-    f.read(&nb, 4); // Number of fields
-    f.read(&es, 4); // Size of a record
-    f.read(&ss, 4); // String size
+    if (f.read(&na, 4) != 4) // Number of records
+        return false;
+    if (f.read(&nb, 4) != 4) // Number of fields
+        return false;
+    if (f.read(&es, 4) != 4) // Size of a record
+        return false;
+    if (f.read(&ss, 4) != 4) // String size
+        return false;
 
     recordSize = es;
     recordCount = na;
@@ -65,7 +70,9 @@ bool DBCFile::open()
 
     data = new unsigned char[recordSize * recordCount + stringSize];
     stringTable = data + recordSize * recordCount;
-    f.read(data, recordSize * recordCount + stringSize);
+    std::size_t dataSize = recordSize * recordCount + stringSize;
+    if (f.read(data, dataSize) != dataSize)
+        return false;
     f.close();
     return true;
 }
