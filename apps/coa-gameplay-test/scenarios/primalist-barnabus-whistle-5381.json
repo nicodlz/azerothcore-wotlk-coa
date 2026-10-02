@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "name": "Beastmaster's Whistle: Barnabus tames an animal spirit",
+  "contract": "Item 79567 casts dummy spell 79347, whose authentic tooltip promises to tame Barnabus; its VanityCollection record associates creature 2753. A Spirit Beast Wildwalker uses the inventory item to obtain a persistent Barnabus pet. An ordinary Warrior remains without a pet, and repeating the item with a current pet creates no additional saved pet.",
+  "timeout_ms": 60000,
+  "players": [
+    {
+      "id": "wildwalker",
+      "race": 1,
+      "class": 31,
+      "level": 37
+    },
+    {
+      "id": "warrior",
+      "race": 1,
+      "class": 1,
+      "level": 37
+    }
+  ],
+  "steps": [
+    {
+      "action": "specialization",
+      "actor": "wildwalker",
+      "id": 59
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "knows_spell",
+      "spell": 92148,
+      "equals": 1
+    },
+    {
+      "action": "add_item",
+      "actor": "wildwalker",
+      "item": 79567
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "pet_entry",
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "warrior",
+      "item": 79567
+    },
+    {
+      "action": "assert",
+      "actor": "warrior",
+      "metric": "pet_entry",
+      "equals": 0
+    },
+    {
+      "action": "use_item",
+      "actor": "warrior",
+      "item": 79567,
+      "spell": 79347
+    },
+    {
+      "action": "wait",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "actor": "warrior",
+      "metric": "pet_entry",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "warrior",
+      "metric": "pet_rows",
+      "equals": 0
+    },
+    {
+      "action": "use_item",
+      "actor": "wildwalker",
+      "item": 79567,
+      "spell": 79347
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "pet_entry",
+      "equals": 2753,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "pet_rows",
+      "equals": 1,
+      "within_ms": 5000
+    },
+    {
+      "action": "wait",
+      "ms": 1500
+    },
+    {
+      "action": "reset_cooldown",
+      "actor": "wildwalker",
+      "spell": 79347
+    },
+    {
+      "action": "use_item",
+      "actor": "wildwalker",
+      "item": 79567,
+      "spell": 79347
+    },
+    {
+      "action": "wait",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "pet_entry",
+      "equals": 2753
+    },
+    {
+      "action": "assert",
+      "actor": "wildwalker",
+      "metric": "pet_rows",
+      "equals": 1,
+      "within_ms": 5000
+    }
+  ]
+}

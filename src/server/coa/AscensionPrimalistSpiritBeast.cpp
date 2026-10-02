@@ -2,6 +2,7 @@
 
 #include "AscensionPrimalistSpiritBeast.h"
 #include "Creature.h"
+#include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "Spell.h"
@@ -109,6 +110,38 @@ SpellCastResult CheckHarnessTarget(Player* player, Unit* unitTarget)
     return SPELL_CAST_OK;
 }
 
+class spell_ascension_barnabus_whistle : public SpellScript
+{
+    PrepareSpellScript(spell_ascension_barnabus_whistle);
+
+    static constexpr uint32 BarnabusWhistle = 79347;
+    static constexpr uint32 Barnabus = 2753;
+
+    bool Validate(SpellInfo const* info) override
+    {
+        return info->Id == BarnabusWhistle && info->Effects[EFFECT_0].Effect == SPELL_EFFECT_DUMMY &&
+            info->Effects[EFFECT_0].TargetA.GetTarget() == TARGET_UNIT_CASTER;
+    }
+
+    void Tame(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Player* player = GetHitPlayer();
+        CreatureTemplate const* creature = sObjectMgr->GetCreatureTemplate(Barnabus);
+        if (!IsAscensionPrimalistTameEligible(player) || !creature || !creature->family ||
+            !creature->IsTameable(player->CanTameExoticPets()) || player->GetPetGUID() ||
+            player->GetCharmGUID() || player->IsExistPet())
+            return;
+
+        player->CreatePet(Barnabus, GetSpellInfo()->Id);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ascension_barnabus_whistle::Tame, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 class spell_ascension_primalist_harness : public SpellScript
 {
     PrepareSpellScript(spell_ascension_primalist_harness);
@@ -184,6 +217,7 @@ void ApplyAscensionPrimalistSpiritBeastContract(SpellInfo* spellInfo)
 
 void AddSC_AscensionPrimalistSpiritBeast()
 {
+    RegisterSpellScript(spell_ascension_barnabus_whistle);
     RegisterSpellScript(spell_ascension_primalist_harness);
     RegisterSpellScript(spell_ascension_primalist_harness_tame);
 }
