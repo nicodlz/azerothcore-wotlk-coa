@@ -113,6 +113,18 @@ class SettingsTests(WorkspaceTest):
         with self.assertRaisesRegex(ValueError, 'Unknown settings.*ports'):
             verify_all.load_settings(path, explicit=True)
 
+    def test_cache_slot_setting_accepts_zero_and_rejects_non_integer_or_negative_values(self):
+        for value in (0, 2):
+            path = write(Path(self.directory.name) / 'settings.json',
+                         json.dumps({'gameplay_cache_slot_start': value}))
+            self.assertEqual(verify_all.load_settings(path, explicit=True), {'gameplay_cache_slot_start': value})
+        for value in (-1, True, '2', 2.5):
+            with self.subTest(value=value):
+                path = write(Path(self.directory.name) / 'settings.json',
+                             json.dumps({'gameplay_cache_slot_start': value}))
+                with self.assertRaises(ValueError):
+                    verify_all.load_settings(path, explicit=True)
+
     def test_default_settings_are_optional_but_an_explicit_file_must_exist(self):
         missing = Path(self.directory.name) / 'missing.json'
         self.assertEqual(verify_all.load_settings(missing, explicit=False), {})
@@ -841,6 +853,24 @@ class GameplayTests(WorkspaceTest):
         defaults = verify_all.gameplay_module('run').CLOCK_SETTINGS
         self.assertEqual((args.step_ms, args.active_wait_cap_ms, args.poll_cap_ms),
                          (defaults['StepMs'], defaults['ActiveWaitCapMs'], defaults['PollCapMs']))
+
+    def test_cache_slot_start_is_exposed_in_plans_and_cli_overrides_settings(self):
+        workspace = self.workspace()
+        settings = write(workspace.base / 'settings.json', json.dumps({'gameplay_cache_slot_start': 2}))
+        for arguments, expected in (([], 0), (['--settings', str(settings)], 2),
+                                    (['--settings', str(settings), '--gameplay-cache-slot-start', '3'], 3),
+                                    (['--settings', str(settings), '--gameplay-cache-slot-start', '0'], 0)):
+            with self.subTest(arguments=arguments):
+                planned = self.planned_gameplay(workspace, arguments)
+                self.assertEqual(planned['cache_slot_start'], expected)
+                command = planned['commands'][0]
+                batch = verify_all.gameplay_module('batch')
+                parsed = batch.parser().parse_args(command[3:])
+                self.assertEqual(parsed.world_cache_slot_start, expected)
+
+    def test_negative_cache_slot_start_is_rejected_by_cli(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            verify_all.parser().parse_args(['--gameplay-cache-slot-start', '-1'])
 
     def test_world_database_modes_are_exclusive_options(self):
         self.assertEqual(verify_all.parser().parse_args(['--refresh-world']).world_databases, 'refresh')

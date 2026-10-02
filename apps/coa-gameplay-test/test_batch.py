@@ -19,7 +19,8 @@ import batch
 import catalog
 import run
 import verification
-from world_cache import write_json
+from world_cache import WorldCache, write_json
+from test_world_cache import DatabaseFixture, SERVER_UUID
 
 DIRECTORY = Path(__file__).resolve().parent
 FAKE_SERVER = r'''
@@ -576,6 +577,147 @@ class BatchTests(unittest.TestCase):
         self.assertTrue(result['failures'])
         self.assertEqual(verification.verify([self.output / 'cases' / 'alpha'], self.definitions)['status'],
                          'failed')
+
+    def test_negative_cache_slot_start_is_rejected_before_any_server_starts(self):
+        code, result = self.batch('--world-cache-slot-start', '-1', '--scenario', 'alpha')
+        self.assertEqual(code, 1)
+        self.assertIsNone(result)
+        self.assertIn('--world-cache-slot-start must be nonnegative', self.stderr.getvalue())
+        self.assertEqual(self.starts(), [])
+
+    def install_cache_transport(self):
+        fixture = DatabaseFixture(self.path)
+        self.cache_server_uuid = SERVER_UUID
+
+        def sql(database, role, statement, timeout=60):
+            if statement == 'SELECT @@server_uuid;':
+                return self.cache_server_uuid
+            return fixture.sql(role, statement, timeout)
+
+        def copy(database, role):
+            fixture.names = database.names
+            fixture.copy(role)
+
+        patches = [patch('world_cache.world_fingerprint',
+                         side_effect=lambda database, name: fixture.schemas[name]['data']),
+                   patch.object(run.Databases, 'sql', autospec=True, side_effect=sql),
+                   patch.object(run.Databases, 'copy', autospec=True, side_effect=copy)]
+        for patched in patches:
+            patched.start()
+            self.addCleanup(patched.stop)
+        return fixture
+
+    def warm_slot(self, fixture, slot=2, inputs='inputs'):
+        cache = WorldCache(fixture, self.path / 'cache' / f'slot-{slot}', inputs)
+        cache.prepare()
+        cache.ready({'waiting_for_start': True}, self.path / 'start.json', 'warm-run')
+        cache.finish()
+        return cache
+
+    def test_default_slot_still_copies_when_only_another_slot_is_warm(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        code, result = self.batch('--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 2)
+        self.assertEqual(result['servers'][0]['world_cache']['mode'], 'created')
+        self.assertNotEqual(result['servers'][0]['world_cache']['database'], warm.name)
+
+    def test_selected_warm_slot_reuses_the_actual_world_cache(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha', 'beta')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 1)
+        self.assertEqual(result['servers'][0]['slot'], 2)
+        self.assertEqual(result['servers'][0]['world_cache']['mode'], 'reused')
+        self.assertEqual(result['servers'][0]['world_cache']['database'], warm.name)
+        self.assertTrue(result['servers'][0]['world_cache']['retained'])
+        self.assertFalse((self.path / 'cache' / 'slot-0').exists())
+        self.assertEqual(fixture.schemas['source_world']['data'], 'original data')
+
+    def test_selected_slot_refreshes_after_source_data_changes(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        fixture.schemas['source_world']['data'] = 'changed source data'
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 2)
+        self.assertEqual(fixture.dropped, [warm.name])
+        self.assertEqual(result['servers'][0]['world_cache']['mode'], 'refreshed')
+
+    def test_selected_slot_refreshes_after_input_changes(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture, inputs='previous SQL/config')
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 2)
+        self.assertEqual(fixture.dropped, [warm.name])
+        self.assertEqual(result['servers'][0]['world_cache']['mode'], 'refreshed')
+
+    def test_selected_slot_never_adopts_another_mysql_server_identity(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        self.cache_server_uuid = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 2)
+        self.assertEqual(fixture.dropped, [])
+        self.assertIn(warm.name, fixture.schemas)
+        self.assertNotEqual(result['servers'][0]['world_cache']['database'], warm.name)
+
+    def test_selected_slot_refuses_changed_ownership_without_dropping_it(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        fixture.schemas[warm.name]['token'] = 'f' * 64
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 1)
+        self.assertEqual(fixture.copies, 1)
+        self.assertEqual(fixture.dropped, [])
+        self.assertTrue(any('ownership mismatch' in error for error in result['failures']))
+
+    def test_selected_slot_refuses_a_concurrent_lease(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        lease = '{"runner_pid": 123, "results": "another-run"}'
+        warm.lock.write_text(lease)
+        code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1', '--scenario', 'alpha')
+        self.assertEqual(code, 1)
+        self.assertEqual(fixture.copies, 1)
+        self.assertEqual(fixture.dropped, [])
+        self.assertEqual(warm.lock.read_text(), lease)
+        self.assertTrue(any('World cache is leased' in error for error in result['failures']))
+
+    def test_slot_start_keeps_distinct_workers_behind_the_startup_barrier(self):
+        with patch.object(run, 'WorldCache', FakeCache):
+            code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '2', '--scenario', *SLOW)
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual({cache.root for cache in FakeCache.instances},
+                         {(self.path / 'cache' / 'slot-2').resolve(), (self.path / 'cache' / 'slot-3').resolve()})
+        self.assertTrue(all(cache.released for cache in FakeCache.instances))
+        self.assertEqual({server['slot'] for server in result['servers']}, {2, 3})
+
+    def test_slot_start_is_preserved_by_restarts(self):
+        with patch.object(run, 'WorldCache', FakeCache):
+            code, result = self.batch('--world-cache-slot-start', '2', '--jobs', '1',
+                                      '--scenario', 'aborter', 'alpha')
+        self.assertEqual(code, 1)
+        self.assertEqual([server['slot'] for server in result['servers']], [2, 2])
+        self.assertEqual({cache.root for cache in FakeCache.instances},
+                         {(self.path / 'cache' / 'slot-2').resolve()})
+        self.assertTrue(self.summary('alpha')['batch']['server_directory'].endswith('slot-2-2'))
+
+    def test_slot_start_is_preserved_by_real_pace_and_isolated_reruns(self):
+        fixture = self.install_cache_transport()
+        warm = self.warm_slot(fixture)
+        code, result = self.simulated('--world-cache-slot-start', '2', '--lanes', '2', '--isolated-rerun',
+                                     '--scenario', 'flaky', 'beta')
+        self.assertEqual(code, 0, self.stderr.getvalue())
+        self.assertEqual(fixture.copies, 1)
+        self.assertEqual(result['cases']['flaky']['mode'], 'isolated')
+        self.assertEqual(self.summary('flaky', 'isolated')['world_cache']['database'], warm.name)
+        self.assertEqual(self.summary('flaky', 'real-pace')['batch']['slot'], 2)
+        self.assertEqual({server['slot'] for server in result['servers']}, {2})
 
     def test_workers_use_separate_world_cache_slots_behind_the_startup_barrier(self):
         with patch.object(run, 'WorldCache', FakeCache):
