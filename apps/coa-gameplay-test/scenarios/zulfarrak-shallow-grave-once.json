@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Zul'Farrak Shallow Graves trigger their summons once per loot generation",
-  "contract": "Upstream AzerothCore PR 27381 establishes that trapped grave 128403 summons via its WDB-linked trap 128972 once when loot is generated; inert grave 128308 must not summon. Opening 6247 must preserve existing loot and must not recast Summon Zul'Farrak Zombies 10247 when another opening requests the same loot. This scenario leaves the initial loot window open so even a randomly empty loot roll stays in GO_ACTIVATED, then opens the same grave from a second player and again from the original opener. The native AllSpellScript cast hook counts spell 10247 from world triggers 12999; unlike SMSG_SPELL_GO it observes this triggered spell with no visual. A snapshot isolates the case from earlier process-wide casts. Both players form a party before entering Zul'Farrak and must see one another in the same dungeon instance; otherwise the second player would open a different, fresh grave. The inert control uses spawn 27101, whose nearest other inert grave is over twelve yards away, to keep the normal range lookup unambiguous including object radii. Both players have full bags.",
+  "contract": "A trapped shallow grave summons its linked trap once per loot activation; reopened graves are inert.",
   "timeout_ms": 90000,
   "players": [
     {
