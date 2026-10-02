@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Kologarn caches consistently award one Emblem of Triumph",
-  "contract": "The 25-player Cache of Living Stone (195047, loot 26929) awards exactly one Emblem of Triumph (47241), matching the unchanged 10-player cache (195046, loot 27061). Each assertion fills the native loot template 256 times and checks every generated quantity rather than averaging random outcomes.",
+  "contract": "Both Kologarn caches award one Emblem of Triumph per native loot fill.",
   "players": [
     { "id": "raider", "race": 1, "class": 1, "level": 80 }
   ],
