@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "name": "Homebound Portal carries its visitors to the owner hearthstone (#6101)",
+  "contract": "Original Spell.dbc 93186 describes a portal that sends heroes to its owner Hearthstone. Its TRANS_DOOR effect summons gameobject80775. The authorized conquest-of-azeroth gameobjectcache (release data-cache-945cd3b8b0ce4a496586, SHA256 2c6b42a32516c3b5fbc3f67c48af21ac7e07e46e6808bacc337503e6cdb220ac, captured2026-09-04 from57 sources) specifies type22, display1026702, size1.5, Data0=93187, charges0, partyOnly0 and allowMounted1. A human owner binds at Goldshire; an ungrouped dwarf visitor keeps a different homebind. Both use the portal created with item97758 in Stormwind, and arrive at the owner homebind. This exercises the native item-use and gameobject-use opcodes and server positions, not client rendering.",
+  "timeout_ms": 60000,
+  "location": {
+    "map": 0,
+    "x": -9458.0,
+    "y": 42.0,
+    "z": 55.5
+  },
+  "players": [
+    {
+      "id": "owner",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    },
+    {
+      "id": "visitor",
+      "race": 3,
+      "class": 1,
+      "level": 60
+    }
+  ],
+  "creatures": [
+    {
+      "id": "innkeeper",
+      "owner": "owner",
+      "entry": 295,
+      "faction": 12,
+      "level": 30
+    }
+  ],
+  "steps": [
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "at_homebind",
+      "equals": 0
+    },
+    {
+      "action": "binder_activate",
+      "actor": "owner",
+      "target": "innkeeper"
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "at_homebind",
+      "equals": 1
+    },
+    {
+      "action": "teleport",
+      "actor": "owner",
+      "map": 0,
+      "x": -8817.0,
+      "y": 632.0,
+      "z": 94.5,
+      "o": 0.0
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "at_homebind",
+      "equals": 0
+    },
+    {
+      "action": "teleport",
+      "actor": "visitor",
+      "map": 0,
+      "x": -8817.0,
+      "y": 632.0,
+      "z": 94.5,
+      "o": 0.0
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "at_homebind",
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "owner",
+      "item": 97758
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "item_count",
+      "item": 97758,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "nearby_gameobject_count",
+      "entry": 80775,
+      "equals": 0
+    },
+    {
+      "action": "use_item",
+      "actor": "owner",
+      "item": 97758,
+      "spell": 93186,
+      "destination": {
+        "x": -8815.0,
+        "y": 632.0,
+        "z": 94.5
+      }
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "cast_failure",
+      "spell": 93186,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "nearby_gameobject_count",
+      "entry": 80775,
+      "equals": 1,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "owned_gameobject_count",
+      "entry": 80775,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "gameobject_display",
+      "entry": 80775,
+      "equals": 1026702
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "gameobject_scale",
+      "entry": 80775,
+      "equals": 1.5
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "item_count",
+      "item": 97758,
+      "equals": 1
+    },
+    {
+      "action": "use_nearby_gameobject",
+      "actor": "visitor",
+      "entry": 80775
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "map_id",
+      "equals": 0,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "position_x",
+      "within_ms": 5000,
+      "min": -9463,
+      "max": -9453
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "position_y",
+      "min": 37,
+      "max": 47
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "position_z",
+      "min": 50.5,
+      "max": 60.5
+    },
+    {
+      "action": "assert",
+      "actor": "visitor",
+      "metric": "at_homebind",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "at_homebind",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "nearby_gameobject_count",
+      "entry": 80775,
+      "equals": 1
+    },
+    {
+      "action": "use_nearby_gameobject",
+      "actor": "owner",
+      "entry": 80775
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "at_homebind",
+      "equals": 1,
+      "within_ms": 5000
+    }
+  ]
+}
