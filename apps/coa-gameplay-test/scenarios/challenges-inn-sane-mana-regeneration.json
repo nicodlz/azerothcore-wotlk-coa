@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Inn-Sane publishes the mana regeneration rate it actually permits (#6084)",
-  "contract": "Effective coa_challenge_definition challenge 76 contains NO_MANA_REGENERATION_UNLESS_RESTED; coa_challenge_spell maps it to aura 93149. The authentic Spell.dbc aura is only a dummy fatigue marker, so the expected mana policy comes from the challenge rule, not that dummy description. Blessing of Wisdom 19742 supplies native aura 85 with resolved amount 10 mana per five seconds: Player::UpdateManaRegen divides that by five and publishes both regeneration rates. A fresh level-one Cultist first demonstrates actual mana regeneration with no challenge. Outside a rested area, Inn-Sane must then suppress actual mana gains and publish zero in both mana regeneration fields. Entering the effective Goldshire tavern trigger 562 must restore mana gains and positive published rates; leaving the tavern must block them again. Stopping Inn-Sane outside must restore normal rates. The sent-rate observations decode native values-only object update fields and fail if the field was never observed; they do not establish rendered client behavior. Aura removal and reapplication must keep both rates zero while blocked and restore the native flat contribution while rested. Normal regeneration must remain positive across rested transitions after the challenge stops.",
+  "contract": "Inn-Sane mana regeneration and published rates follow inn state, buffs and challenge activation.",
   "timeout_ms": 120000,
   "location": {
     "map": 0,
