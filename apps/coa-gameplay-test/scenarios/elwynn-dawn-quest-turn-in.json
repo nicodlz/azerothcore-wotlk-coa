@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "name": "Dawn preserves services and accepts the completed Elwynn quest",
+  "contract": "The realm-sourced quest text and creature_questender mapping identify NPC 958 as the turn-in for quest 254098. rev_20260923_01_coa_elwynn_quests.sql explicitly sets its QUESTGIVER flag (2), but the later rev_20260930_98_northshire_baseline_restore.sql replaces its template without that flag. Player::CanInteractWithQuestGiver requires flag 2 for reward requests and choices, and PrepareGossipMenu only populates creature quests with that flag. The regression fixtures completed objectives with prepare_quest, then exercises native gossip and actual CMSG_QUESTGIVER_REQUEST_REWARD/CHOOSE_REWARD handlers; it checks the offer packet, rewarded status and consumed delivery items. It does not test objective acquisition, client rendering or original world spawn placement. The existing vendor request remains a control for retained NPC service flags.",
+  "timeout_ms": 60000,
+  "location": {
+    "map": 0,
+    "x": -8914,
+    "y": -133,
+    "z": 80.6
+  },
+  "players": [
+    {
+      "id": "hero",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    }
+  ],
+  "creatures": [
+    {
+      "id": "questgiver",
+      "owner": "hero",
+      "entry": 958,
+      "distance": 2
+    }
+  ],
+  "steps": [
+    {
+      "action": "prepare_quest",
+      "actor": "hero",
+      "quest": 254098
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "quest_rewarded",
+      "quest": 254098,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "item_count",
+      "item": 354525,
+      "equals": 1
+    },
+    {
+      "action": "snapshot",
+      "actor": "hero",
+      "metric": "server_packets",
+      "opcode": 415,
+      "save_as": "service"
+    },
+    {
+      "action": "client_packet",
+      "label": "Existing vendor service remains accessible",
+      "actor": "hero",
+      "opcode": 414,
+      "consumed": false,
+      "fields": [
+        {
+          "actor_guid": "questgiver"
+        }
+      ]
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "server_packets",
+      "opcode": 415,
+      "relative_to": "service",
+      "equals": 1
+    },
+    {
+      "action": "gossip_hello",
+      "actor": "hero",
+      "target": "questgiver"
+    },
+    {
+      "action": "assert",
+      "label": "Completed quest is listed in the native quest menu",
+      "actor": "hero",
+      "metric": "quest_menu_has",
+      "quest": 254098,
+      "equals": 1
+    },
+    {
+      "action": "snapshot",
+      "actor": "hero",
+      "metric": "server_packets",
+      "opcode": 397,
+      "save_as": "offers"
+    },
+    {
+      "action": "client_packet",
+      "label": "Request the reward through the questgiver protocol",
+      "actor": "hero",
+      "opcode": 396,
+      "consumed": false,
+      "fields": [
+        {
+          "actor_guid": "questgiver"
+        },
+        {
+          "u32": 254098
+        }
+      ]
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "server_packets",
+      "opcode": 397,
+      "relative_to": "offers",
+      "equals": 1
+    },
+    {
+      "action": "client_packet",
+      "label": "Submit reward choice through the questgiver protocol",
+      "actor": "hero",
+      "opcode": 398,
+      "consumed": false,
+      "fields": [
+        {
+          "actor_guid": "questgiver"
+        },
+        {
+          "u32": 254098
+        },
+        {
+          "u32": 0
+        }
+      ]
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "quest_rewarded",
+      "quest": 254098,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "hero",
+      "metric": "item_count",
+      "item": 354525,
+      "equals": 0
+    }
+  ]
+}
