@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Movement config reload preserves independent player and NPC base speeds",
-  "contract": "Reloads preserve run speeds: canonical 7 times each configured rate and the creature template multiplier.",
+  "contract": "Reloads preserve run speeds: canonical 7 times the configured rate and creature template multiplier.",
   "players": [
     {
       "id": "player",
