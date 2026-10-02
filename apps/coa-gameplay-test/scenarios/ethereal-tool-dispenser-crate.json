@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "name": "Ethereal Tool Dispenser Crate grants one dispenser and preserves failed exchanges",
+  "contract": "The tooltip of item 8263511 promises \"Contains a brand new Ethereal Tool Dispenser!\". Using the crate must grant exactly one item 8263501 and consume that crate. With full bags the crate must remain and no reward is lost. Other items sharing Smoke (60034) must retain their own behavior.",
+  "timeout_ms": 30000,
+  "players": [
+    {
+      "id": "crafter",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    },
+    {
+      "id": "full",
+      "race": 1,
+      "class": 12,
+      "level": 1
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "add_item",
+      "actor": "crafter",
+      "item": 8263511
+    },
+    {
+      "action": "use_item",
+      "actor": "crafter",
+      "item": 8263511,
+      "spell": 60034
+    },
+    {
+      "action": "assert",
+      "actor": "crafter",
+      "metric": "item_count",
+      "item": 8263501,
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "crafter",
+      "metric": "item_count",
+      "item": 8263511,
+      "equals": 0
+    },
+    {
+      "action": "add_item",
+      "actor": "full",
+      "item": 8263511
+    },
+    {
+      "action": "fill_bags",
+      "actor": "full"
+    },
+    {
+      "action": "assert",
+      "actor": "full",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "use_item",
+      "actor": "full",
+      "item": 8263511,
+      "spell": 60034
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "full",
+      "metric": "item_count",
+      "item": 8263501,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "full",
+      "metric": "item_count",
+      "item": 8263511,
+      "equals": 1
+    }
+  ]
+}
