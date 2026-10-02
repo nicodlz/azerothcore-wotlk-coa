@@ -2791,7 +2791,8 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
             if (attacker)
             {
-                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, schoolMask,
+                    splitted_absorb, splitted_resist, false, 0, false, true);
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
@@ -2800,7 +2801,8 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask,
+                splitSpellInfo, false);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements

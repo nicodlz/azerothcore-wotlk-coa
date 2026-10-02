@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Split damage: hostile recipient enters combat after Hand of Sacrifice",
-  "contract": "Authentic CoA Spell.dbc6940 applies aura81 SPLIT_DAMAGE_PCT across school mask127, amount30 and describes transferring30% damage to its caster. The caster receiving hostile damage must enter combat. Five real players enable PvP through their native handlers. An Undead Mage uses normal FireBlast2136 casts with spell_hit_rating10000 to remove the miss roll; two independent Alliance pairs distinguish group membership alone from actual redirection. Without Hand, the protected player loses health and enters combat while its partner remains unhurt and out of combat. With normal Hand cast, both protected player and caster lose health, and the actual damage recipient enters combat. No fixed damage roll or forwarded RNG is assumed. Flat/shared damage branches, pet invisibility autocast, friendly and no-initial-aggro interactions are outside this scenario.",
+  "contract": "Hostile damage redirected by Hand of Sacrifice engages its recipient in combat.",
   "timeout_ms": 90000,
   "players": [
     {
