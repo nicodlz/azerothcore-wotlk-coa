@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Kitta preserves services and accepts the completed Elwynn quest",
-  "contract": "The realm-sourced quest text and creature_questender mapping identify NPC 11072 as the turn-in for quest 254106. rev_20260923_01_coa_elwynn_quests.sql explicitly sets its QUESTGIVER flag (2), but the later rev_20260930_98_northshire_baseline_restore.sql replaces its template without that flag. Player::CanInteractWithQuestGiver requires flag 2 for reward requests and choices, and PrepareGossipMenu only populates creature quests with that flag. The regression fixtures completed objectives with prepare_quest, then exercises native gossip and actual CMSG_QUESTGIVER_REQUEST_REWARD/CHOOSE_REWARD handlers; it checks the offer packet, rewarded status and consumed delivery items. It does not test objective acquisition, client rendering or original world spawn placement. The existing trainer request remains a control for retained NPC service flags.",
+  "contract": "Native questgiver packets retain services and deliver completed Elwynn quests; see PR data provenance.",
   "timeout_ms": 60000,
   "location": {
     "map": 0,
