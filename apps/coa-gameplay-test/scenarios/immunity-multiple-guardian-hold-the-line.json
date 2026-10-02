@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Hold the Line source-counted extra immunities",
+  "contract": "Two grouped Guardians apply Hold the Line from independent owners. Cancelling the first owned aura must preserve the second application; cancelling the final owned aura must remove all extra incapacitate, sap and destination knockback immunity. The actual area-aura lifecycle runs and the native immunity methods are the oracle. Explicit aura fixtures do not test normal spell acquisition, cost or cooldown.",
+  "players": [
+    {
+      "id": "first",
+      "race": 1,
+      "class": 18,
+      "level": 80
+    },
+    {
+      "id": "second",
+      "race": 1,
+      "class": 18,
+      "level": 80
+    }
+  ],
+  "creatures": [
+    {
+      "id": "enemy",
+      "owner": "first",
+      "entry": 36,
+      "distance": 3
+    }
+  ],
+  "steps": [
+    {
+      "action": "group",
+      "actor": "first",
+      "target": "second"
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "set_aura",
+      "actor": "first",
+      "spell": 803830,
+      "stacks": 1
+    },
+    {
+      "action": "set_aura",
+      "actor": "second",
+      "spell": 803830,
+      "stacks": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "aura",
+      "spell": 803830,
+      "caster": "first",
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "aura",
+      "spell": 803830,
+      "caster": "second",
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_immune",
+      "spell": 6770,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Both sources active"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 1776,
+      "effect": 2,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Both sources active"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 51469,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Both sources active"
+    },
+    {
+      "action": "cancel_aura",
+      "actor": "first",
+      "spell": 803830
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "aura",
+      "spell": 803830,
+      "caster": "first",
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "aura",
+      "spell": 803830,
+      "caster": "second",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_immune",
+      "spell": 6770,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Second application still protects"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 1776,
+      "effect": 2,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Second application still protects"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 51469,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 1,
+      "label": "Second application still protects"
+    },
+    {
+      "action": "cancel_aura",
+      "actor": "second",
+      "spell": 803830
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "aura",
+      "spell": 803830,
+      "equals": 0,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_immune",
+      "spell": 6770,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 0,
+      "label": "No protection after final source ends"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 1776,
+      "effect": 2,
+      "target": "enemy",
+      "equals": 0,
+      "label": "No protection after final source ends"
+    },
+    {
+      "action": "assert",
+      "actor": "second",
+      "metric": "spell_effect_immune",
+      "spell": 51469,
+      "effect": 0,
+      "target": "enemy",
+      "equals": 0,
+      "label": "No protection after final source ends"
+    }
+  ]
+}
