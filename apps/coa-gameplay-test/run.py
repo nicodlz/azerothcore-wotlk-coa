@@ -86,7 +86,7 @@ METRICS = {
     'spell_damage_count', 'spell_damage_total', 'spell_uses_armor',
     'spell_heal_count', 'spell_heal_total', 'spell_effective_heal_total',
     'pet_aura_amount', 'pet_aura_amplitude_ms', 'pet_max_health', 'pet_attack_power', 'pet_run_speed_rate',
-    'distance', 'spell_proc_count', 'temporary_spell_replacement', 'map_id', 'area_trigger_contains',
+    'distance', 'spell_proc_count', 'temporary_spell_replacement', 'area_trigger_contains',
     'creature_loot_quality_rate',
     'quest_menu_items', 'quest_menu_has', 'player_setting', 'server_packets', 'server_packet_contains',
     'player_class', 'cached_class', 'at_login_flag', 'wildcard_starter_spells_known', 'action_bar_unknown_spells',

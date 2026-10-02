@@ -1615,8 +1615,6 @@ private:
         }
         if (metric == "level")
             return unit->GetLevel();
-        if (metric == "map_id")
-            return unit->GetMapId();
         if (metric == "area_trigger_contains")
         {
             Player* player = unit->ToPlayer();
