@@ -166,7 +166,7 @@ class aura_ascension_witch_hunter_lifecycle : public AuraScript
         }
     }
 
-    void Apply(AuraEffect const* effect, AuraEffectHandleModes)
+    void Apply(AuraEffect const* effect, AuraEffectHandleModes mode)
     {
         if (!First(effect))
             return;
@@ -201,7 +201,7 @@ class aura_ascension_witch_hunter_lifecycle : public AuraScript
             player->UpdateSpeed(MOVE_RUN, true);
         if (Family(GetSpellInfo(), 1, 4194304) && player)
             player->RemoveAurasDueToSpell(706241);
-        if (id == 805770)
+        if (id == 805770 && (mode & AURA_EFFECT_HANDLE_REAL))
             owner->ApplySpellImmune(id, IMMUNITY_SCHOOL, 126, true);
         if (id == 92091 && player)
             Cast(player, player, 500570);

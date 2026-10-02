@@ -73,7 +73,7 @@ class aura_ascension_necromancer_lifecycle : public AuraScript
             interval = 2000;
         }
     }
-    void Apply(AuraEffect const* effect, AuraEffectHandleModes)
+    void Apply(AuraEffect const* effect, AuraEffectHandleModes mode)
     {
         Player* player = Owner(GetCaster());
         if (!player)
@@ -120,7 +120,7 @@ class aura_ascension_necromancer_lifecycle : public AuraScript
             Cast(player, player, 504747);
         if (id == 500981)
             Cast(player, player, 504691);
-        if (id == 804371)
+        if (id == 804371 && (mode & AURA_EFFECT_HANDLE_REAL))
             player->ApplySpellImmune(id, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
         for (uint32 charge : {800979, 801747, 707176, 807856, 572777})
             if (id == charge)

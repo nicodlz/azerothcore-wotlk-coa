@@ -29,6 +29,8 @@ void Immunity(Player* player, uint32 source, std::initializer_list<uint32> mecha
 class aura_ascension_cultist_lifecycle : public AuraScript
 {
     PrepareAuraScript(aura_ascension_cultist_lifecycle);
+
+    bool _heraldImmunityApplied = false;
     void ScaleHerald(AuraEffect const*, AuraEffectHandleModes)
     {
         constexpr uint32 HeraldDisplay = 28844;
@@ -68,7 +70,7 @@ class aura_ascension_cultist_lifecycle : public AuraScript
             Cast(player, target, 802789);
             Cast(player, target, 803746);
         }
-        if (id == 520345)
+        if (id == 520345 && (mode & AURA_EFFECT_HANDLE_REAL))
             Immunity(player, id, {MECHANIC_STUN, MECHANIC_SILENCE}, true);
         if (id == 520450)
             Cast(player, target, 520498);
@@ -94,12 +96,16 @@ class aura_ascension_cultist_lifecycle : public AuraScript
             {
                 Cast(player, player, 806769);
                 Cast(player, player, 807312);
-                Immunity(player, id, {MECHANIC_FEAR, MECHANIC_HORROR, MECHANIC_POLYMORPH}, true);
+                if (!_heraldImmunityApplied)
+                {
+                    Immunity(player, id, {MECHANIC_FEAR, MECHANIC_HORROR, MECHANIC_POLYMORPH}, true);
+                    _heraldImmunityApplied = true;
+                }
             }
             if (player->HasAura(300290))
                 player->UpdateSpeed(MOVE_RUN, true);
         }
-        if (id == 681104)
+        if (id == 681104 && (mode & AURA_EFFECT_HANDLE_REAL))
             Immunity(player, id, {MECHANIC_STUN}, true);
         if (id == 255281)
             Cast(player, player, 255283);
@@ -186,7 +192,11 @@ class aura_ascension_cultist_lifecycle : public AuraScript
         {
             player->RemoveAurasDueToSpell(806769);
             player->RemoveAurasDueToSpell(807312);
-            Immunity(player, id, {MECHANIC_FEAR, MECHANIC_HORROR, MECHANIC_POLYMORPH}, false);
+            if (_heraldImmunityApplied)
+            {
+                Immunity(player, id, {MECHANIC_FEAR, MECHANIC_HORROR, MECHANIC_POLYMORPH}, false);
+                _heraldImmunityApplied = false;
+            }
         }
         if (id == 681104)
             Immunity(player, id, {MECHANIC_STUN}, false);

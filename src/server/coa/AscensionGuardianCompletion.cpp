@@ -111,6 +111,8 @@ class aura_ascension_guardian_lifecycle : public AuraScript
 {
     PrepareAuraScript(aura_ascension_guardian_lifecycle);
 
+    bool _immunityApplied = false;
+
     void Calculate(AuraEffect const* effect, int32& amount, bool& recalculate)
     {
         if (effect->GetEffIndex() == EFFECT_0 && Dynamic(GetId()))
@@ -171,8 +173,12 @@ class aura_ascension_guardian_lifecycle : public AuraScript
             owner->UpdateSpeed(MOVE_RUN, true);
         else if (GetId() == 804691 && GetCaster() && GetCaster()->HasAura(503631))
         {
-            owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-            owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+            if (!_immunityApplied)
+            {
+                owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+                _immunityApplied = true;
+            }
             owner->RemoveAurasWithMechanic((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE), AURA_REMOVE_BY_DEFAULT);
         }
     }
@@ -206,8 +212,12 @@ class aura_ascension_guardian_lifecycle : public AuraScript
                 owner->UpdateSpeed(MOVE_RUN, true);
                 break;
             case 804691:
-                owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_ROOT, false);
-                owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_SNARE, false);
+                if (_immunityApplied)
+                {
+                    owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_ROOT, false);
+                    owner->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_SNARE, false);
+                    _immunityApplied = false;
+                }
                 break;
             default:
                 break;

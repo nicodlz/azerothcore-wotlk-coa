@@ -22,7 +22,7 @@ bool First(AuraEffect const* effect)
 class aura_ascension_starcaller_lifecycle : public AuraScript
 {
     PrepareAuraScript(aura_ascension_starcaller_lifecycle);
-    void Apply(AuraEffect const* effect, AuraEffectHandleModes)
+    void Apply(AuraEffect const* effect, AuraEffectHandleModes mode)
     {
         if (!First(effect))
             return;
@@ -57,7 +57,8 @@ class aura_ascension_starcaller_lifecycle : public AuraScript
         if (Named(GetSpellInfo(), 800505))
         {
             player->RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
-            player->ApplySpellImmune(id, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+            if (mode & AURA_EFFECT_HANDLE_REAL)
+                player->ApplySpellImmune(id, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
             State(player).chargeX = player->GetPositionX();
             State(player).chargeY = player->GetPositionY();
             State(player).chargeAura = id;

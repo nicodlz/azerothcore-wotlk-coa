@@ -242,16 +242,7 @@ class aura_ascension_guardian_hold_the_line : public AuraScript
 
     void Remove(AuraEffect const*, AuraEffectHandleModes)
     {
-        Unit* target = GetTarget();
-        auto const& effects = target->GetAuraEffectsByType(SPELL_AURA_EFFECT_IMMUNITY);
-        bool protectedByAnother = std::any_of(effects.begin(), effects.end(), [this, target](AuraEffect const* other)
-        {
-            if (other->GetId() != GetId() || other->GetBase() == GetAura())
-                return false;
-            AuraApplication const* application = other->GetBase()->GetApplicationOfTarget(target->GetGUID());
-            return application && application->IsActive(other->GetEffIndex());
-        });
-        SetExtraImmunities(protectedByAnother);
+        SetExtraImmunities(false);
     }
 
     void Register() override
