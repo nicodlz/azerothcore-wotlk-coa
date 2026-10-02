@@ -1965,7 +1965,8 @@ private:
             {
                 Loot loot;
                 loot.FillLoot(lootId, LootTemplates_Creature, player, true, true);
-                hits += std::any_of(loot.items.begin(), loot.items.end(), [quality, itemRate, itemId](LootItem const& item)
+                hits += std::any_of(loot.items.begin(), loot.items.end(),
+                    [quality, itemRate, itemId](LootItem const& item)
                 {
                     if (itemRate)
                         return item.itemid == itemId;
