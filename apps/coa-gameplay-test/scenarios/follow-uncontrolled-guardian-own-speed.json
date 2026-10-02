@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Follow movement: uncontrolled guardian keeps its own spline speed",
-  "contract": "Upstream #27719 distinguishes guardians without pet bars from controllable guardians. Authentic SummonProperties 1021 creates the Mirror Image guardian without the controllable flag; assertions verify that classification. With its own native run speed 7 yd/s and owner fixture run speed 14 yd/s, a recall from 40 yd must launch an active native follow spline at 7 yd/s. Before the fix it inherits and boosts owner speed. Fixture SetSpeed replaces actual mounting and MotionMaster::MoveFollow replaces a pet-bar request; this tests native movement execution, not summon-spell acquisition, client animation, mounted speed effects or completed travel.",
+  "contract": "Native follow: uncontrolled guardian retains its own speed despite faster owner.",
   "timeout_ms": 90000,
   "players": [
     {

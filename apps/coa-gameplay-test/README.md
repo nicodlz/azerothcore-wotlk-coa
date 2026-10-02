@@ -418,8 +418,8 @@ assert stable maximums and final levels when testing damage coefficients.
 | `attack` | `actor`, `target`: native melee attack request; optional `pet: true` sends the pet's attack command. Verify combat or damage with assertions. |
 | `stop_attack` | Player `actor`: native melee stop request. |
 | `pvp` | Player `actor`, boolean `enabled`: native PvP toggle request. Disabling retains the ordinary flag-removal timer. |
-| `follow` | Creature `actor`, owner player `target`, fixture `distance` (3..100 yd): reposition the owned creature and start native `MotionMaster::MoveFollow`; assert an active spline and its speed. |
-| `set_run_speed` | `actor`, fixture run-speed `rate` (0.1..10): native `SetSpeed(MOVE_RUN)`; does not apply a mount aura. |
+| `follow` | Owned creature `actor`, player `target`, `distance` (3..100 yd): native follow; see spline metrics. |
+| `set_run_speed` | `actor`, fixture `rate` (0.1..10): native run speed; see spline metrics. |
 | `set_moving` | Player `actor`, boolean `enabled`: fixture the native forward movement flag for cast restriction tests. |
 | `group` | `actor`, `target`, optional `loot_method` (0-4): fixture party; creates the actor's group if needed, adds an ungrouped player and sets the loot method. |
 | `lfg_dungeon` | `actor`, LFGDungeons.dbc `dungeon`: fixture Dungeon Finder group; converts the actor's ordinary group to an LFG group assigned to that dungeon, as a completed proposal does. |
@@ -569,7 +569,14 @@ healing. They accept the same caster/critical filters; `target_pet: true` select
 `target`. Absorbed healing is excluded. These metrics avoid confusing normal regeneration with spell healing.
 The result's optional `cast_failures` array records native `SMSG_CAST_FAILED` spell IDs, cast counters and
 numeric `SpellCastResult` reasons. These diagnose a rejected submission; effect assertions still establish success.
-`spline_active` reads whether the native movement spline is unfinished; `spline_velocity` reads its launched speed in yards per second. Pair them to avoid observing the stale velocity of a completed spline. `run_speed` reads native run speed in yards per second; `guardian` and `controllable_guardian` read the native unit classifications. Creature fixtures can specify `summon_properties` to instantiate through that authentic DBC row; unknown rows fail fixture creation.
+`spline_active` reads whether the native movement spline is unfinished; `spline_velocity` reads its launched speed in
+yards per second. Pair them to avoid observing the stale velocity of a completed spline. `run_speed` reads native run
+speed in yards per second; `guardian` and `controllable_guardian` read the native unit classifications. Creature
+fixtures can specify `summon_properties` to instantiate through that authentic DBC row; unknown rows fail fixture
+creation.
+The `follow` action repositions the owned creature at its fixture distance, then starts native MotionMaster::MoveFollow
+toward its owner. Assert an active spline and its speed. The `set_run_speed` action uses native SetSpeed(MOVE_RUN) and
+does not apply a mount aura.
 
 `distance` requires `target` and measures the native two-dimensional distance, in yards, between the actor and
 that target. It reads position and nothing else, so displacement from a knockback, pull or teleport shows up as

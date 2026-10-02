@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Follow movement: controllable guardian recall caps real spline speed",
-  "contract": "Upstream #27719 and linked WotLK Classic follow-movement sniffs bound catch-up speed at 2.6 times owner speed. At owner speed 7 yd/s, a controllable guardian recalled from 40 yd must launch a spline at 18.2 yd/s. SummonProperties 1561 creates an authentic controllable Water Elemental guardian; ownership and classification are asserted. A nearby guardian still follows an accelerated 14 yd/s owner. SetSpeed configures owner speed without a mount spell; native MotionMaster and actual MoveSpline velocity are exercised. This does not exercise pet-bar packets, actual mounting, chase, client animation or travel completion. The precise standing-owner 40-yard retail observation rests on only a few upstream sniff samples; the accepted 2.6x cap is the asserted contract.",
+  "contract": "Native follow: controllable guardian cap 2.6x owner speed; accelerated-owner control.",
   "timeout_ms": 90000,
   "players": [
     {
