@@ -5,7 +5,9 @@
     "The active Eye of Kimbul debuff 802707 has E1 SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER (308), BasePoints 0 plus",
     "DieSides 1 = 1%, and StackAmount 5. Parent 503714 promises critical strikes apply that target debuff.",
     "Learning the parent must not grant global critical chance; one through five actual debuff applications must",
-    "grant 1 through 5 percentage points against that target alone."
+    "grant 1 through 5 percentage points against that target alone.",
+    "The fixture caps the native equal-level spell hit chance before requiring one stack per direct debuff cast.",
+    "This checks debuff application and target-specific critical chance, not critical-strike proc generation."
   ],
   "timeout_ms": 90000,
   "players": [
@@ -13,13 +15,21 @@
       "id": "w",
       "race": 1,
       "class": 13,
-      "level": 60
+      "level": 60,
+      "spell_hit_rating": 10000
     }
   ],
   "steps": [
     {
       "action": "wait",
       "ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "w",
+      "metric": "spell_hit_chance",
+      "min": 4,
+      "label": "Fixture hit bonus covers the native equal-level spell miss chance"
     },
     {
       "action": "snapshot",
