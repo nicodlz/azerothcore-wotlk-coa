@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Deeprun Tram: native geometry agrees with the CoA client at the reported point",
-  "contract": "Native zero-delta geometry accepts the reported CoA trigger point, rejects outside and wrong-map points.",
+  "contract": "Native zero-delta geometry accepts the CoA report point, rejects outside and wrong-map points.",
   "location": {"map": 0, "x": -8353.81, "y": 514.589, "z": 84.4088},
   "players": [{"id": "traveler", "race": 1, "class": 8, "level": 80}],
   "steps": [
