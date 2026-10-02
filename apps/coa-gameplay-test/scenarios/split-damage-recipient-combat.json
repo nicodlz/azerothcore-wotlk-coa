@@ -293,5 +293,12 @@
       "relative_to": "linked_protected_max",
       "equals": 0
     }
-  ]
+  ],
+  "location": {
+    "map": 0,
+    "x": -9617.06,
+    "y": -288.949,
+    "z": 57.3053,
+    "o": 0
+  }
 }
