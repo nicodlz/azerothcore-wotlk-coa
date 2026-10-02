@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Movement config reload preserves independent player and NPC base speeds",
-  "contract": "Rate.MoveSpeed.Player and Rate.MoveSpeed.NPC independently multiply the canonical run speed of 7 yards/sec. Reloading identical configuration twice must not multiply either speed again. Run the discriminating before/after comparison with AC_RATE_MOVE_SPEED_PLAYER=1 and AC_RATE_MOVE_SPEED_NPC=2; also run player=2,NPC=0.5 and the default 1/1 controls. Both rates must be positive. Observations call Unit::GetSpeed, not GetSpeedRate, on an ordinary player and an uncontrolled creature. No mounted, pet-controlled or rendered-client packet behavior is asserted.",
+  "contract": "Rate.MoveSpeed.Player and Rate.MoveSpeed.NPC independently multiply the canonical run speed of 7 yards/sec; creatures additionally retain their effective creature_template.speed_run multiplier. The fixture observes template speed independently of Unit::GetSpeedRate and asserts that the live speed rate matches that template (ordinary player rate 1). Absolute Unit::GetSpeed divided by configured rate times effective template speed must be 7 before and after two real reload config commands; neither actual speed may compound. NPC 36 has speed_run 1.14286, so its initial absolute speed is about 8.00002 times the NPC configuration rate, not 7 times that rate. Run the discriminating before/after comparison with AC_RATE_MOVE_SPEED_PLAYER=1 and AC_RATE_MOVE_SPEED_NPC=2; also run player=2,NPC=0.5 and default1/1 controls. Both rates must be positive. No mounted, pet-controlled or rendered-client packet behavior is asserted.",
   "players": [
     {
       "id": "player",
@@ -34,8 +34,36 @@
     },
     {
       "action": "snapshot",
+      "actor": "npc",
+      "metric": "run_speed_template_rate",
+      "save_as": "npc_template"
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "run_speed_rate",
+      "ratio_to": "npc_template",
+      "min": 0.99999,
+      "max": 1.00001
+    },
+    {
+      "action": "snapshot",
       "actor": "player",
-      "metric": "run_speed_config_rate",
+      "metric": "run_speed_template_rate",
+      "save_as": "player_template"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "run_speed_rate",
+      "ratio_to": "player_template",
+      "min": 0.99999,
+      "max": 1.00001
+    },
+    {
+      "action": "snapshot",
+      "actor": "player",
+      "metric": "run_speed_configured_scale",
       "save_as": "player_config"
     },
     {
@@ -55,7 +83,7 @@
     {
       "action": "snapshot",
       "actor": "npc",
-      "metric": "run_speed_config_rate",
+      "metric": "run_speed_configured_scale",
       "save_as": "npc_config"
     },
     {

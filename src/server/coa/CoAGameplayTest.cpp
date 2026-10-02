@@ -1690,8 +1690,22 @@ private:
             return unit->IsControlledByPlayer();
         if (metric == "run_speed")
             return unit->GetSpeed(MOVE_RUN);
-        if (metric == "run_speed_config_rate")
-            return sWorld->getRate(unit->IsControlledByPlayer() ? RATE_MOVESPEED_PLAYER : RATE_MOVESPEED_NPC);
+        if (metric == "run_speed_template_rate")
+        {
+            if (unit->IsPlayer())
+                return 1.0;
+            Creature const* creature = unit->ToCreature();
+            Require(creature != nullptr, "Run speed template observation needs a player or creature");
+            return creature->GetCreatureTemplate()->speed_run;
+        }
+        if (metric == "run_speed_configured_scale")
+        {
+            if (unit->IsControlledByPlayer())
+                return sWorld->getRate(RATE_MOVESPEED_PLAYER);
+            Creature const* creature = unit->ToCreature();
+            Require(creature != nullptr, "NPC run speed scale needs a creature");
+            return sWorld->getRate(RATE_MOVESPEED_NPC) * creature->GetCreatureTemplate()->speed_run;
+        }
         if (metric == "run_speed_rate")
             return unit->GetSpeedRate(MOVE_RUN);
         if (metric == "spell_hit_bonus_taken")
