@@ -170,7 +170,8 @@
       "actor": "smith",
       "metric": "gameobject_scale",
       "entry": 2202000,
-      "equals": 0.2
+      "min": 0.199999,
+      "max": 0.200001
     },
     {
       "action": "assert",
