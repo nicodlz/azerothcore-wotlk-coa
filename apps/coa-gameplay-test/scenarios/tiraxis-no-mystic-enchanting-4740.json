@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "name": "Tiraxis excludes unsupported Mystic Enchanting specializations (#4740)",
+  "contract": "Mystic Enchanting: Specialization 1806961 unlocks a specialization at an Enchanting Altar according to its item description. CoA has no Mystic Enchanting system: the item has neither an item script nor a use spell, and the existing Wildcard specialization cache contract also excludes it. Tiraxis 900007 opens virtual vendor 900008 through his Convenience Items gossip option. That live vendor list must not offer 1806961, while Apprentice Riding Tome 3001006 remains available. The scenario inspects the vendor list sent by the native session after the actual gossip selection; it does not claim rendered client coverage.",
+  "timeout_ms": 120000,
+  "location": { "map": 0, "x": -8805.62, "y": 666.285, "z": 96.2015 },
+  "players": [
+    { "id": "buyer", "race": 1, "class": 25, "level": 60 }
+  ],
+  "creatures": [
+    { "id": "tiraxis", "owner": "buyer", "entry": 900007, "distance": 2, "faction": 35 }
+  ],
+  "steps": [
+    { "action": "wait", "ms": 3000 },
+    { "action": "gossip_hello", "actor": "buyer", "target": "tiraxis" },
+    { "action": "assert", "actor": "buyer", "metric": "gossip_options", "equals": 5 },
+    { "action": "gossip_select", "actor": "buyer", "option": 1 },
+    { "action": "assert", "actor": "buyer", "metric": "vendor_list_packets", "equals": 1 },
+    { "action": "assert", "actor": "buyer", "metric": "vendor_price", "item": 3001006, "min": 0,
+      "label": "Convenience Items still offers Apprentice Riding" },
+    { "action": "assert", "actor": "buyer", "metric": "vendor_price", "item": 1806961, "equals": -1,
+      "label": "Unsupported Mystic Enchanting specializations cannot be purchased from this list" }
+  ]
+}
