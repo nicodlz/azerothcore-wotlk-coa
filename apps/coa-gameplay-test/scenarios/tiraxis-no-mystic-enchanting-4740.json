@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Tiraxis excludes unsupported Mystic Enchanting specializations (#4740)",
-  "contract": "Mystic Enchanting: Specialization 1806961 unlocks a specialization at an Enchanting Altar according to its item description. CoA has no Mystic Enchanting system: the item has neither an item script nor a use spell, and the existing Wildcard specialization cache contract also excludes it. Tiraxis 900007 opens virtual vendor 900008 through his Convenience Items gossip option. That live vendor list must not offer 1806961, while Apprentice Riding Tome 3001006 remains available. The scenario inspects the vendor list sent by the native session after the actual gossip selection; it does not claim rendered client coverage.",
+  "contract": "Tiraxis offers Riding but does not sell the unsupported Mystic Enchanting specialization.",
   "timeout_ms": 120000,
   "location": { "map": 0, "x": -8805.62, "y": 666.285, "z": 96.2015 },
   "players": [
