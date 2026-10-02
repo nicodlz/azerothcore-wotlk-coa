@@ -269,6 +269,15 @@ public:
         return itr == _casts.end() ? 0 : itr->second;
     }
 
+    static uint32 CastCountForEntry(uint32 entry, uint32 spell)
+    {
+        uint32 total = 0;
+        for (auto const& [key, count] : _casts)
+            if (key.first.IsCreature() && key.first.GetEntry() == entry && key.second == spell)
+                total += count;
+        return total;
+    }
+
     static void Forget(std::set<ObjectGuid> const& units)
     {
         auto const owned = [&units](auto const& entry) { return units.contains(entry.first.first); };
@@ -1730,6 +1739,8 @@ private:
         if (metric == "spell_cast_count")
         {
             Require(sSpellMgr->GetSpellInfo(spell) != nullptr, "Unknown spell in metric");
+            if (auto entry = step.get_optional<uint32>("entry"))
+                return ProcCounter::CastCountForEntry(*entry, spell);
             return ProcCounter::CastCount(unit->GetGUID(), spell);
         }
         if (metric == "spell_proc_count")
@@ -3642,6 +3653,17 @@ private:
                 Item* item = player->GetItemByEntry(*targetItem);
                 Require(item != nullptr, "Target item is missing");
                 targets.SetItemTarget(item);
+            }
+            else if (auto entry = step.get_optional<uint32>("target_gameobject"))
+            {
+                std::list<GameObject*> objects;
+                player->GetGameObjectListWithEntryInGrid(objects, *entry, 5.0f);
+                objects.remove_if([player](GameObject* object)
+                {
+                    return !object->IsInWorld() || !object->isSpawned() || !player->InSamePhase(object);
+                });
+                Require(objects.size() == 1, "Gameobject cast needs exactly one nearby object");
+                targets.SetGOTarget(objects.front());
             }
             else
                 targets.SetUnitTarget(target);

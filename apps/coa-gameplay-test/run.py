@@ -140,7 +140,7 @@ ACTIONS = {
     'set_aura': ({'actor', 'spell', 'stacks'}, {'actor', 'spell', 'stacks', 'pet'}),
     'cancel_aura': ({'actor', 'spell'}, {'actor', 'spell'}),
     'cancel_mount': ({'actor'}, {'actor'}),
-    'cast': ({'actor', 'spell'}, {'actor', 'spell', 'target', 'destination', 'target_pet'}),
+    'cast': ({'actor', 'spell'}, {'actor', 'spell', 'target', 'destination', 'target_pet', 'target_gameobject'}),
     'attack': ({'actor', 'target'}, {'actor', 'target', 'pet'}),
     'pvp': ({'actor', 'enabled'}, {'actor', 'enabled'}),
     'group': ({'actor', 'target'}, {'actor', 'target', 'loot_method'}),
@@ -323,6 +323,11 @@ def validate(scenario):
                 require(type(step['target_pet']) is bool, f'{where}: target_pet must be boolean')
                 require(step['actor'] in player_ids and 'target' not in step,
                         f'{where}: target_pet casts from a player at their current pet')
+        if 'target_gameobject' in step:
+            require(action == 'cast' and step['actor'] in player_ids,
+                    f'{where}: gameobject targets need a player cast')
+            require(not {'target', 'target_pet'} & step.keys(),
+                    f'{where}: gameobject targets cannot also select a unit')
         for key in ('target', 'caster'):
             if key in step:
                 require(step[key] in actor_ids, f'{where}: unknown {key}')
@@ -337,7 +342,7 @@ def validate(scenario):
                 if key in step:
                     number(step[key], f'{where}.{key}', -17000, 17000)
         for key in ('spell', 'item', 'talent', 'count', 'entry', 'quest', 'id', 'challenge', 'level',
-                    'target_item', 'achievement', 'title'):
+                    'target_item', 'target_gameobject', 'achievement', 'title'):
             if key in step:
                 number(step[key], f'{where}.{key}', 1, 2**31 - 1, True)
         for key, maximum in (('rank', 4), ('effect', 2), ('slot', 22),('power', 6), ('choice', 5),

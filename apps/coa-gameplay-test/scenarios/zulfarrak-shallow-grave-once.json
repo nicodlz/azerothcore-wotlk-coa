@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "name": "Zul'Farrak Shallow Graves trigger their summons once per loot generation",
+  "contract": "Upstream AzerothCore PR 27381 establishes that trapped grave 128403 summons via its WDB-linked trap 128972 once when loot is generated; inert grave 128308 must not summon. Opening 6247 must preserve existing loot and must not recast Summon Zul'Farrak Zombies 10247 when another opening requests the same loot. This scenario leaves the initial loot window open so even a randomly empty loot roll stays in GO_ACTIVATED, then opens the same grave from a second player and again from the original opener. The native AllSpellScript cast hook counts spell 10247 from world triggers 12999; unlike SMSG_SPELL_GO it observes this triggered spell with no visual. A snapshot isolates the case from earlier process-wide casts. Both players have full bags.",
+  "timeout_ms": 90000,
+  "players": [
+    {
+      "id": "opener",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    },
+    {
+      "id": "mate",
+      "race": 1,
+      "class": 1,
+      "level": 60
+    }
+  ],
+  "location": {
+    "map": 209,
+    "x": 1890.12,
+    "y": 989.759,
+    "z": 8.87679,
+    "o": 0,
+    "ignore_access": true
+  },
+  "steps": [
+    {
+      "action": "set_health",
+      "actor": "opener",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
+      "action": "set_health",
+      "actor": "mate",
+      "maximum": 1000000,
+      "value": 1000000
+    },
+    {
+      "action": "set_phase",
+      "actor": "opener",
+      "value": 1
+    },
+    {
+      "action": "learn",
+      "actor": "opener",
+      "spell": 6247
+    },
+    {
+      "action": "fill_bags",
+      "actor": "opener"
+    },
+    {
+      "action": "assert",
+      "actor": "opener",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "set_phase",
+      "actor": "mate",
+      "value": 1
+    },
+    {
+      "action": "learn",
+      "actor": "mate",
+      "spell": 6247
+    },
+    {
+      "action": "fill_bags",
+      "actor": "mate"
+    },
+    {
+      "action": "assert",
+      "actor": "mate",
+      "metric": "free_inventory_slots",
+      "equals": 0
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "snapshot",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "spell": 10247,
+      "entry": 12999,
+      "save_as": "initial_summon_casts"
+    },
+    {
+      "action": "cast",
+      "actor": "opener",
+      "spell": 6247,
+      "target_gameobject": 128403
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "The trapped grave activates its summon spell exactly once",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    },
+    {
+      "action": "cast",
+      "actor": "mate",
+      "spell": 6247,
+      "target_gameobject": 128403
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "Repeated opening does not retrigger the linked trap",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    },
+    {
+      "action": "cast",
+      "actor": "opener",
+      "spell": 6247,
+      "target_gameobject": 128403
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "Repeated opening does not retrigger the linked trap",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    },
+    {
+      "action": "cast",
+      "actor": "mate",
+      "spell": 6247,
+      "target_gameobject": 128403
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "Repeated opening does not retrigger the linked trap",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    },
+    {
+      "action": "cast",
+      "actor": "opener",
+      "spell": 6247,
+      "target_gameobject": 128403
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "Repeated opening does not retrigger the linked trap",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    },
+    {
+      "action": "teleport",
+      "actor": "opener",
+      "map": 209,
+      "x": 1863.41,
+      "y": 1044.78,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "teleport",
+      "actor": "mate",
+      "map": 209,
+      "x": 1863.41,
+      "y": 1044.78,
+      "z": 8.87679,
+      "o": 0
+    },
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "cast",
+      "actor": "opener",
+      "spell": 6247,
+      "target_gameobject": 128308
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "assert",
+      "label": "The inert grave never casts the summon spell",
+      "actor": "opener",
+      "metric": "spell_cast_count",
+      "entry": 12999,
+      "spell": 10247,
+      "equals": 1,
+      "relative_to": "initial_summon_casts"
+    }
+  ]
+}

@@ -222,6 +222,17 @@ class RunnerTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 run.validate(scenario)
 
+    def test_cast_at_gameobject_rejects_ambiguous_targets(self):
+        self.scenario['steps'].append({'action': 'cast', 'actor': 'caster', 'spell': 6247,
+                                       'target_gameobject': 128403})
+        self.assertIs(run.validate(self.scenario), self.scenario)
+        for change in ({'target_gameobject': 0}, {'target': 'caster'}, {'target_pet': True},
+                       {'actor': 'target'}, {'action': 'use_item', 'item': 1234}):
+            scenario = copy.deepcopy(self.scenario)
+            scenario['steps'][-1].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                run.validate(scenario)
+
     def test_cast_at_current_pet(self):
         self.scenario['steps'].append({'action': 'cast', 'actor': 'caster', 'spell': 801707, 'target_pet': True})
         self.assertIs(run.validate(self.scenario), self.scenario)
