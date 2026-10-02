@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Generic Prestigious Cache grants the latest released named cache (#6011)",
-  "contract": "Prestigious Cache 1287330 promises: Grants the most recent Prestigious Cache available. With Ascension.PrestigiousCache.ClassicStages=8 and TbcStages=0, the newest populated Classic tier is Naxxramas1287311. The wrapper must grant exactly one unopened named cache and no gear or tokens. Native CMSG_OPEN_ITEM activates the wrapper. The named cache retains its own gear payout. With full bags, the existing delivery service must mail exactly one unopened named cache before consuming the wrapper.",
+  "contract": "The all-content cache grants the named current-stage cache without opening its gear reward pool.",
   "timeout_ms": 30000,
   "players": [
     {
