@@ -18121,8 +18121,10 @@ float Unit::GetCollisionWidth() const
     float defaultSize = DEFAULT_WORLD_OBJECT_SIZE * scaleMod;
 
     //! Dismounting case - use basic default model data
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = displayInfo ? sCreatureModelDataStore.LookupEntry(displayInfo->ModelId) : nullptr;
+    if (!modelData)
+        return objectSize;
 
     if (IsMounted())
     {
@@ -18159,8 +18161,10 @@ float Unit::GetCollisionHeight() const
     float scaleMod = GetObjectScale(); // 99% sure about this
     float defaultHeight = DEFAULT_COLLISION_HEIGHT * scaleMod;
 
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = displayInfo ? sCreatureModelDataStore.LookupEntry(displayInfo->ModelId) : nullptr;
+    if (!modelData)
+        return defaultHeight;
     float collisionHeight = 0.0f;
 
     if (IsMounted())
