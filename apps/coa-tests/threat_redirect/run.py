@@ -4,6 +4,7 @@ import re
 import runpy
 import sqlite3
 import struct
+import shutil
 import subprocess
 import tempfile
 import sys
@@ -49,9 +50,20 @@ def main():
         out = Path(directory)
         cpp, exe = out / 'redirect.cpp', out / 'redirect.exe'
         cpp.write_text(code, encoding='utf-8')
-        compiler = Path(os.environ['VCToolsInstallDir']) / 'bin/Hostx64/x64/cl.exe'
-        subprocess.run([str(compiler), '/nologo', '/std:c++20', '/EHsc', '/W4', '/WX', '/utf-8',
-                        str(cpp), '/Fe' + str(exe)], cwd=out, check=True, timeout=60)
+        compiler = os.environ.get("CXX")
+        if not compiler:
+            tools = os.environ.get("VCToolsInstallDir")
+            compiler = str(Path(tools) / "bin/Hostx64/x64/cl.exe") if os.name == "nt" and tools else (
+                "cl.exe" if os.name == "nt" else "c++")
+        compiler = shutil.which(compiler)
+        if not compiler:
+            raise RuntimeError("A C++20 compiler is required; set CXX or configure the compiler on PATH")
+        if Path(compiler).name.lower() in {"cl", "cl.exe"}:
+            command = [compiler, "/nologo", "/std:c++20", "/EHsc", "/W4", "/WX", "/utf-8",
+                       str(cpp), "/Fe" + str(exe)]
+        else:
+            command = [compiler, "-std=c++20", "-Wall", "-Wextra", "-Werror", str(cpp), "-o", str(exe)]
+        subprocess.run(command, cwd=out, check=True, timeout=60)
         subprocess.run([str(exe)], check=True, timeout=15)
     db = sqlite3.connect(':memory:')
     db.execute('CREATE TABLE spell_script_names (spell_id INT, ScriptName TEXT)')
