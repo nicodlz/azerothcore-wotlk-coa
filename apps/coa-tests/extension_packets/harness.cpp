@@ -1,6 +1,7 @@
 #include "AscensionCollectibleSpellData.h"
 #include "ItemTemplate.h"
 #include "Optional.h"
+#include "Tokenize.h"
 #include "WorldPacket.h"
 #include <algorithm>
 #include <array>
@@ -49,6 +50,7 @@ std::tm* localtime_r(time_t const* time, std::tm* result)
 }
 #endif
 
+// ACTUAL_TOKENIZE
 // ACTUAL_TIME_BREAKDOWN
 // ACTUAL_BYTE_BUFFER
 
