@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Homebound Portal carries its visitors to the owner hearthstone (#6101)",
-  "contract": "Original Spell.dbc 93186 describes a portal that sends heroes to its owner Hearthstone. Its TRANS_DOOR effect summons gameobject80775. The authorized conquest-of-azeroth gameobjectcache (release data-cache-945cd3b8b0ce4a496586, SHA256 2c6b42a32516c3b5fbc3f67c48af21ac7e07e46e6808bacc337503e6cdb220ac, captured2026-09-04 from57 sources) specifies type22, display1026702, size1.5, Data0=93187, charges0, partyOnly0 and allowMounted1. A human owner binds at Goldshire; an ungrouped dwarf visitor keeps a different homebind. Both use the portal created with item97758 in Stormwind, and arrive at the owner homebind. This exercises the native item-use and gameobject-use opcodes and server positions, not client rendering.",
+  "contract": "Homebound Portal visitors must reach the summoner's Hearthstone through native item and object use.",
   "timeout_ms": 60000,
   "location": {
     "map": 0,
