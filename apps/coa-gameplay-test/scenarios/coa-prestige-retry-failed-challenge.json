@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Prestige permits a new Hardcore attempt after failure (#6083)",
-  "contract": "Hardcore trial 54 has one life, aura 92989 and clean-start level/loot conditions in effective SQL. A native death fails its first run and reactivation is refused during that lifetime. Chromie prestige starts a new level-one lifetime; the maintainer confirmed restriction flags must reset (#6083). A normal challenge activation must therefore succeed after prestige and apply Hardcore aura 92989. This regression keeps the same-lifetime failure restriction enabled. The class 20 Fleshweaver specialization 25 is selected only after reaching 60: ChrSpecs 25 identifies advancement 9905, whose native acquisition loader applies the level 10 identity gate even though its raw RequiredLevel is 0. The fixture resurrects through the console revive command; socketless fixture accounts have ordinary player security, so a player .revive command is not permitted. This setup action does not reset challenge state. A second character loots a sack before prestige, is refused Slow and Steady trial 601 with code 8, then can activate that trial after prestige. This covers the condition cache and failure-independent eligibility.",
+  "contract": "Prestige permits retrying failed Hardcore and Slow and Steady trials; same-life failure remains locked.",
   "timeout_ms": 90000,
   "location": {
     "map": 0,
