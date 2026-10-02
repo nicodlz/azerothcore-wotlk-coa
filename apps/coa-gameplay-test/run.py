@@ -75,6 +75,7 @@ METRICS = {
     'gossip_text',
     'stat', 'attack_power', 'ranged_attack_power', 'armor', 'weapon_damage_min', 'resistance',
     'attack_time_ms', 'pet_attack_time_ms', 'run_speed_rate', 'display_id',
+    'session_player_limit', 'configured_player_limit',
     'aura_amplitude_ms', 'melee_crit_chance', 'dodge_chance', 'parry_chance', 'expertise', 'combat_rating',
     'spell_modifier', 'spell_cast_time_ms', 'spell_max_range', 'spell_max_stacks', 'spell_healing_done',
     'aura_crit_chance', 'aura_script_value', 'melee_hit_chance', 'spell_hit_chance', 'spell_power',
@@ -117,6 +118,7 @@ METRIC_FIELDS = {'actor', 'metric', 'spell', 'power', 'caster', 'effect', 'item'
                  'min_distance', 'owner_display', 'skill', 'cache', 'table', 'exclude', 'dungeon', 'source',
                  'opcode', 'from', 'slot', 'achievement', 'title'}
 ACTIONS = {
+    'set_session_player_limit': ({'actor', 'value'}, {'actor', 'value'}),
     'stop_attack': ({'actor'}, {'actor'}),
     'set_moving': ({'actor', 'enabled'}, {'actor', 'enabled'}),
     'level_scaling_packet': ({'actor', 'value'}, {'actor', 'value'}),
@@ -390,6 +392,8 @@ def validate(scenario):
             require(type(step['enabled']) is bool, f'{where}: enabled must be boolean')
         if action == 'money':
             number(step['copper'], f'{where}.copper', 1, 2**31 - 1, True)
+        if action == 'set_session_player_limit':
+            number(step['value'], f'{where}.value', 0, 2**32 - 1, True)
         if action == 'set_level':
             number(step['value'], f'{where}.value', 1, 80, True)
         if action == 'level_scaling_packet':

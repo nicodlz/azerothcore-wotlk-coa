@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "name": "PlayerLimit config reload reapplies the configured session cap",
+  "contract": "World::LoadConfigSettings(true) must apply the configured PlayerLimit just as startup does. Seed only the runtime manager limit through 1,2,1,0, then run the real reload config command and observe the restored configured value. A focused run with AC_PLAYER_LIMIT=2 gives a discriminating first transition 1 to2; repeat with AC_PLAYER_LIMIT=1 and0. Fixtures restore the prior manager value at teardown, including failed cases. Both socketless actors remain accessible throughout; these actors do not exercise normal WorldSessionMgr login queue admission or client queue packets, so no queue draining, skip permission or rendered client acceptance is claimed.",
+  "players": [
+    {
+      "id": "player",
+      "race": 1,
+      "class": 1,
+      "level": 20
+    },
+    {
+      "id": "other",
+      "race": 1,
+      "class": 1,
+      "level": 20
+    }
+  ],
+  "steps": [
+    {
+      "action": "snapshot",
+      "actor": "player",
+      "metric": "configured_player_limit",
+      "save_as": "configured_limit"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "relative_to": "configured_limit",
+      "equals": 0
+    },
+    {
+      "action": "set_session_player_limit",
+      "actor": "player",
+      "value": 1
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "equals": 1
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "relative_to": "configured_limit",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "assert",
+      "actor": "other",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "set_session_player_limit",
+      "actor": "player",
+      "value": 2
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "equals": 2
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "relative_to": "configured_limit",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "assert",
+      "actor": "other",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "set_session_player_limit",
+      "actor": "player",
+      "value": 1
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "equals": 1
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "relative_to": "configured_limit",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "assert",
+      "actor": "other",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "set_session_player_limit",
+      "actor": "player",
+      "value": 0
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "equals": 0
+    },
+    {
+      "action": "console",
+      "command": "reload config"
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "session_player_limit",
+      "relative_to": "configured_limit",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "level",
+      "equals": 20
+    },
+    {
+      "action": "assert",
+      "actor": "other",
+      "metric": "level",
+      "equals": 20
+    }
+  ]
+}

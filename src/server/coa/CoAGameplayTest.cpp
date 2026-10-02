@@ -56,6 +56,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "WhoListCacheMgr.h"
 
 #include "CoAGameplayClock.h"
@@ -995,6 +996,11 @@ public:
 
     bool Dismiss(bool leaveGroups)
     {
+        if (_savedPlayerLimit)
+        {
+            sWorldSessionMgr->SetPlayerAmountLimit(*_savedPlayerLimit);
+            _savedPlayerLimit.reset();
+        }
         std::set<ObjectGuid> units;
         for (auto const& [id, target] : _targets)
         {
@@ -1686,6 +1692,10 @@ private:
             Require(hand < MAX_ATTACK, "Invalid attack hand");
             return unit->GetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + hand);
         }
+        if (metric == "session_player_limit")
+            return sWorldSessionMgr->GetPlayerAmountLimit();
+        if (metric == "configured_player_limit")
+            return sConfigMgr->GetOption<uint32>("PlayerLimit", 1000);
         if (metric == "run_speed_rate")
             return unit->GetSpeedRate(MOVE_RUN);
         if (metric == "spell_hit_bonus_taken")
@@ -3118,7 +3128,13 @@ private:
             return;
         }
         std::string id = step.get<std::string>("actor");
-        if (action == "attack_owned_creature")
+        if (action == "set_session_player_limit")
+        {
+            if (!_savedPlayerLimit)
+                _savedPlayerLimit = sWorldSessionMgr->GetPlayerAmountLimit();
+            sWorldSessionMgr->SetPlayerAmountLimit(step.get<uint32>("value"));
+        }
+        else if (action == "attack_owned_creature")
         {
             Creature* attacker = GetUnit(id)->ToCreature();
             Player* owner = GetPlayer(step.get<std::string>("target"));
@@ -3988,6 +4004,7 @@ private:
     bool _characterQueueReached = false;
     bool _measured = false;
     uint8 _castCount = 0;
+    std::optional<uint32> _savedPlayerLimit;
     uint32 _timeout = 90000;
     uint32 _assertions = 0;
     uint32 _completed = 0;
