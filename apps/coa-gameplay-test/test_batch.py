@@ -674,7 +674,7 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(fixture.copies, 1)
         self.assertEqual(fixture.dropped, [])
-        self.assertTrue(any('ownership mismatch' in error for error in result['failures']))
+        self.assertTrue(any('ownership mismatch' in server.get('message', '') for server in result['servers']))
 
     def test_selected_slot_refuses_a_concurrent_lease(self):
         fixture = self.install_cache_transport()
@@ -686,7 +686,7 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(fixture.copies, 1)
         self.assertEqual(fixture.dropped, [])
         self.assertEqual(warm.lock.read_text(), lease)
-        self.assertTrue(any('World cache is leased' in error for error in result['failures']))
+        self.assertTrue(any('World cache is leased' in server.get('message', '') for server in result['servers']))
 
     def test_slot_start_keeps_distinct_workers_behind_the_startup_barrier(self):
         with patch.object(run, 'WorldCache', FakeCache):
@@ -710,8 +710,8 @@ class BatchTests(unittest.TestCase):
     def test_slot_start_is_preserved_by_real_pace_and_isolated_reruns(self):
         fixture = self.install_cache_transport()
         warm = self.warm_slot(fixture)
-        code, result = self.simulated('--world-cache-slot-start', '2', '--lanes', '2', '--isolated-rerun',
-                                     '--scenario', 'flaky', 'beta')
+        code, result = self.batch('--clock', 'simulated', '--world-cache-slot-start', '2', '--lanes', '2',
+                                  '--isolated-rerun', '--scenario', 'flaky', 'beta')
         self.assertEqual(code, 0, self.stderr.getvalue())
         self.assertEqual(fixture.copies, 1)
         self.assertEqual(result['cases']['flaky']['mode'], 'isolated')
