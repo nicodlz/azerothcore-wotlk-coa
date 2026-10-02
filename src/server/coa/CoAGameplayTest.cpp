@@ -43,6 +43,7 @@
 #include "Player.h"
 #include "QuestDef.h"
 #include "QueryCallback.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -2333,6 +2334,21 @@ private:
         if (metric == "at_homebind")
             return player->GetMapId() == player->m_homebindMapId &&
                 player->GetExactDist(player->m_homebindX, player->m_homebindY, player->m_homebindZ) <= 5.0f;
+        if (metric == "gameobject_quest_activation")
+        {
+            uint32 entry = step.get<uint32>("entry");
+            GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(entry);
+            Require(info != nullptr && info->GetLinkedGameObjectEntry() == 0,
+                "Quest activation probe needs a known gameobject without a linked object");
+            GameObject object;
+            Require(object.Create(player->GetMap()->GenerateLowGuid<HighGuid::GameObject>(), entry,
+                player->GetMap(), player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(),
+                player->GetPositionZ(), player->GetOrientation(), G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f),
+                0, GO_STATE_READY), "Cannot create quest activation probe");
+            bool active = object.ActivateToQuest(player);
+            object.ResetMap();
+            return active;
+        }
         if (metric == "owned_gameobject_count" || metric == "gameobject_remaining_ms" ||
             metric == "gameobject_display" || metric == "gameobject_scale")
         {
@@ -3258,6 +3274,21 @@ private:
             bool handled = handler.ParseCommands(CommandText(step));
             Require(handled && !handler.HasSentErrorMessage(), "Player command failed");
             record.put("result", "submitted; verify effects with assertions");
+        }
+        else if (action == "force_reaction")
+        {
+            uint32 faction = step.get<uint32>("id");
+            uint32 rank = step.get<uint32>("value");
+            Require(sFactionStore.LookupEntry(faction) != nullptr && rank <= REP_EXALTED,
+                "Invalid forced reputation fixture");
+            player->GetReputationMgr().ApplyForceReaction(faction, ReputationRank(rank), step.get<bool>("enabled"));
+        }
+        else if (action == "add_quest")
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(step.get<uint32>("quest"));
+            Require(quest != nullptr && !player->IsActiveQuest(quest->GetQuestId()) &&
+                player->CanAddQuest(quest, false), "Cannot add quest fixture");
+            player->AddQuestAndCheckCompletion(quest, nullptr);
         }
         else if (action == "prepare_quest" || action == "reward_quest")
         {

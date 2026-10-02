@@ -54,6 +54,7 @@ METRICS = {
     'charm_entry', 'charm_aura_stacks', 'controls_self', 'viewpoint_entry', 'seer_entry', 'private_instance',
     'dynamic_object', 'dynamic_object_duration_ms', 'gossip_options', 'gossip_option_text',
     'owned_gameobject_count', 'gameobject_remaining_ms', 'gameobject_display', 'gameobject_scale', 'at_homebind',
+    'gameobject_quest_activation',
     'spellbook_rows', 'spellbook_offers_spell', 'spellbook_covers_spell', 'spellbook_learned_alerts',
     'spellbook_buy_succeeded', 'spellbook_buy_failed',
     'spellbook_buys_granted', 'spellbook_unannounced_buys', 'spellbook_misannounced_buys',
@@ -135,6 +136,8 @@ ACTIONS = {
     'learn': ({'actor', 'spell'}, {'actor', 'spell'}),
     'set_action_button': ({'actor', 'button'}, {'actor', 'spell', 'button', 'wildcard_slot'}),
     'grant_resource': ({'actor', 'spell'}, {'actor', 'spell', 'amount'}),
+    'add_quest': ({'actor', 'quest'}, {'actor', 'quest'}),
+    'force_reaction': ({'actor', 'id', 'value', 'enabled'}, {'actor', 'id', 'value', 'enabled'}),
     'unlearn': ({'actor', 'spell'}, {'actor', 'spell', 'all_specs'}),
     'money': ({'actor', 'copper'}, {'actor', 'copper'}),
     'set_aura': ({'actor', 'spell', 'stacks'}, {'actor', 'spell', 'stacks', 'pet'}),
@@ -380,6 +383,11 @@ def validate(scenario):
                 number(step[key], f'{where}.{key}', 0, scenario.get('timeout_ms', 90000), True)
         if action in {'set_skill', 'gather_skill'}:
             number(step['skill'], f'{where}.skill', 1, 65535, True)
+        if action == 'force_reaction':
+            number(step['value'], f'{where}.value', 0, 7, True)
+            require(type(step['enabled']) is bool, f'{where}: enabled must be boolean')
+        if action in {'force_reaction', 'add_quest'}:
+            require(step['actor'] in player_ids, f'{where}: fixture needs a player')
         if action == 'set_skill':
             number(step['maximum'], f'{where}.maximum', 1, 450, True)
             number(step['value'], f'{where}.value', 0, step['maximum'], True)
@@ -592,7 +600,8 @@ def validate(scenario):
             if metric in {'spellbook_offers_spell', 'spellbook_learned_alerts',
                           'spellbook_buy_succeeded', 'spellbook_buy_failed', 'cast_failure'}:
                 require('spell' in step, f'{where}: metric needs spell')
-            if metric in {'owned_gameobject_count', 'gameobject_remaining_ms', 'gameobject_display', 'gameobject_scale'}:
+            if metric in {'owned_gameobject_count', 'gameobject_remaining_ms', 'gameobject_display', 'gameobject_scale',
+                          'gameobject_quest_activation'}:
                 require('entry' in step, f'{where}: metric needs gameobject entry')
             if metric in {'quest_status', 'quest_takeable', 'quest_objective_count'}:
                 require('quest' in step, f'{where}: metric needs quest')
@@ -636,6 +645,7 @@ def validate(scenario):
                           'charm_aura_stacks', 'controls_self', 'private_instance',
                           'dynamic_object', 'dynamic_object_duration_ms', 'gossip_options', 'gossip_option_text',
                           'owned_gameobject_count', 'gameobject_remaining_ms', 'gameobject_display', 'gameobject_scale',
+                          'gameobject_quest_activation',
                           'at_homebind',
                           'spellbook_rows', 'spellbook_offers_spell', 'spellbook_covers_spell',
                           'spellbook_learned_alerts', 'spellbook_buy_succeeded', 'spellbook_buy_failed',

@@ -1,0 +1,347 @@
+{
+  "schema": 1,
+  "name": "Quest gameobject activation follows faction and explicit objectives",
+  "contract": "Alliance and Horde salvage chests activate only for their own faction, except forced-friendly reputation. Explicit hostile gameobject objectives remain active. This checks native ActivateToQuest on temporary objects, not client rendering, interaction or loot packets. Forced reputation is an explicit fixture setup, not spell acquisition.",
+  "timeout_ms": 90000,
+  "players": [
+    {
+      "id": "alliance",
+      "race": 1,
+      "class": 1,
+      "level": 80
+    },
+    {
+      "id": "horde",
+      "race": 2,
+      "class": 1,
+      "level": 80
+    },
+    {
+      "id": "tauren",
+      "race": 6,
+      "class": 1,
+      "level": 80
+    }
+  ],
+  "steps": [
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 0,
+      "label": "No quest means no salvage quest activation"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 0,
+      "label": "No quest means no salvage quest activation"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 0,
+      "label": "No quest means no salvage quest activation"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 0,
+      "label": "No quest means no salvage quest activation"
+    },
+    {
+      "action": "add_quest",
+      "actor": "alliance",
+      "quest": 10055
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "quest_status",
+      "quest": 10055,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "add_quest",
+      "actor": "horde",
+      "quest": 10086
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "quest_status",
+      "quest": 10086,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182798,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182799,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182937,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182938,
+      "equals": 1,
+      "label": "Own-faction salvage is active for required items"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 0,
+      "label": "Opposing salvage must not activate even though its loot contains the same quest item"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 0,
+      "label": "Mirrored opposing salvage is inactive"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182937,
+      "equals": 0,
+      "label": "Every opposing salvage variant stays inactive"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182938,
+      "equals": 0,
+      "label": "Every opposing salvage variant stays inactive"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182798,
+      "equals": 0,
+      "label": "Every opposing salvage variant stays inactive"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 182799,
+      "equals": 0,
+      "label": "Every opposing salvage variant stays inactive"
+    },
+    {
+      "action": "force_reaction",
+      "actor": "alliance",
+      "id": 77,
+      "value": 4,
+      "enabled": true
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 1,
+      "label": "Explicit forced-friendly fixture overrides faction hostility"
+    },
+    {
+      "action": "force_reaction",
+      "actor": "alliance",
+      "id": 77,
+      "value": 4,
+      "enabled": false
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182936,
+      "equals": 0,
+      "label": "Removing forced reputation restores opposing-faction filtering"
+    },
+    {
+      "action": "force_reaction",
+      "actor": "alliance",
+      "id": 77,
+      "value": 1,
+      "enabled": true
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 0,
+      "label": "Explicit forced-hostile fixture blocks even normally friendly salvage"
+    },
+    {
+      "action": "force_reaction",
+      "actor": "alliance",
+      "id": 77,
+      "value": 1,
+      "enabled": false
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 182797,
+      "equals": 1,
+      "label": "Removing forced-hostile fixture restores own-faction activation"
+    },
+    {
+      "action": "add_quest",
+      "actor": "horde",
+      "quest": 9444
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "quest_status",
+      "quest": 9444,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 181653,
+      "equals": 1,
+      "label": "An explicit hostile gameobject objective takes priority"
+    },
+    {
+      "action": "add_quest",
+      "actor": "horde",
+      "quest": 12925
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "quest_status",
+      "quest": 12925,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "assert",
+      "actor": "horde",
+      "metric": "gameobject_quest_activation",
+      "entry": 191840,
+      "equals": 1,
+      "label": "A second explicit hostile object remains active"
+    },
+    {
+      "action": "add_quest",
+      "actor": "tauren",
+      "quest": 753
+    },
+    {
+      "action": "assert",
+      "actor": "tauren",
+      "metric": "quest_status",
+      "quest": 753,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "assert",
+      "actor": "tauren",
+      "metric": "gameobject_quest_activation",
+      "entry": 2907,
+      "equals": 1,
+      "label": "Factionless quest loot is unchanged"
+    },
+    {
+      "action": "add_quest",
+      "actor": "alliance",
+      "quest": 12677
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "quest_status",
+      "quest": 12677,
+      "equals": 3,
+      "label": "The quest stays incomplete without fabricated objective progress"
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 190720,
+      "equals": 1,
+      "label": "The player-hostile Scourge template lies outside the Alliance/Horde-mask filter"
+    },
+    {
+      "action": "set_aura",
+      "actor": "alliance",
+      "spell": 51966,
+      "stacks": 1
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "aura",
+      "spell": 51966,
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "alliance",
+      "metric": "gameobject_quest_activation",
+      "entry": 190720,
+      "equals": 1,
+      "label": "Scourge disguise does not regress the existing activation predicate"
+    }
+  ]
+}
