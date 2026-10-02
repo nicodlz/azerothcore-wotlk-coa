@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Echo of Nozdormu first and higher rank cooldown parity (#5974)",
-  "contract": "Echo of Nozdormu ranks802174 and803407 have identical original-client descriptions promising a5 percent reduction of all spell and ability cooldowns. Shared helper802804 has BasePoints4 and DieSides1, yielding5. Higher rank803407 has SkillLineAbility49284, skill87, and trainer900024 sells it at level18 without prerequisites; SkillLineAbility acquireMethod0 alone does not grant it. These eligible level80 actors seed the combat spells directly and assert knowledge, without claiming to test trainer UI. The first-rank control and higher-rank report each measure Draconic Invocation802119 native cooldown_ms. Natural decay alone cannot reach the0.90-0.96 bounded ratio within the observation window; the advertised5 percent reduction can.",
+  "contract": "Both tested Echo ranks reduce spell cooldowns by 5%; missing Echo leaves cooldowns unchanged.",
   "timeout_ms": 60000,
   "players": [
     {
