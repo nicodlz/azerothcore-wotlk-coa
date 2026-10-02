@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Illidari Council starts once per pull and resets on a wipe",
-  "contract": "Each council pull casts Empyreal Balance (41499) exactly once and starts one Empyreal Equivalency timer. Engaging the other members calls back into the start, so guarding the start must occur before that recursion. Native CoA melee pulls already set encounter 7 IN_PROGRESS through Unit::AtTargetAttacked engaging the controller owner and the controller inheriting BossAI::JustEngagedWith; start/wipe assertions preserve that working behavior. The remaining upstream PR 27883 changes prevent duplicate starts, guarantee a fallback aggro speaker and select death text group 5. Explicit fixtures preserve database AI bindings and register with Black Temple; the companion native extracted-callback harness checks all four initial pullers, both roll extremes, reset/re-pull and death text. This scenario counts the controller native casts by fixture GUID, avoiding packet visibility and cross-lane creatures.",
+  "contract": "Each Council pull casts Empyreal Balance once; all members engage and a wipe resets the encounter.",
   "timeout_ms": 30000,
   "location": {
     "map": 564,
