@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Thermal Anvil supplies a temporary forge and anvil (#5178)",
-  "contract": "Thermal Anvil item 1777028 uses spell 9931265, whose client text promises an anvil and forge for five minutes. Its native effects place gameobjects 2201000 and 2202000. Original CoA cache captures dated 2026-09-04 independently establish their display, size and spell focuses 3 (forge) and 1 (anvil), matching the CoA beta captures dated 2026-07-03. Away from crafting stations, Smelt Copper and Copper Mace fail before item use and produce their DBC-defined items after the Thermal Anvil is placed.",
+  "contract": "Thermal Anvil creates the promised forge and anvil and permits Blacksmithing and Mining recipes.",
   "timeout_ms": 90000,
   "location": {
     "map": 0,
