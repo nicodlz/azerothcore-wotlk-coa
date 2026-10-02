@@ -8,7 +8,7 @@ using uint8 = std::uint8_t;
 using ObjectGuid = uint32;
 using AuraEffectHandleModes = uint32;
 // ENUMS
-constexpr uint32 EFFECT_0 = 0, EFFECT_1 = 1, SPELL_AURA_DUMMY = 4, AURA_EFFECT_HANDLE_REAL = 1;
+[[maybe_unused]] constexpr uint32 EFFECT_0 = 0, EFFECT_1 = 1, SPELL_AURA_DUMMY = 4, AURA_EFFECT_HANDLE_REAL = 1;
 constexpr uint32 GLOBALHOOK_ON_LOAD_SPELL_CUSTOM_ATTR = 1;
 struct ThreatManager
 {

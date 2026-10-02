@@ -116,7 +116,7 @@ int main()
     owner.guid={1};otherOwner.guid={2};target.guid={3};second.guid={4};
     owner.map=otherOwner.map=target.map=second.map=&map;target.x=10;second.x=20;
     for(Unit* unit:{static_cast<Unit*>(&owner),static_cast<Unit*>(&otherOwner),&target,&second})objects[unit->guid]=unit;
-    Spell spell{&owner};spell.info.Id=804020;stormbringer_sphere_hits hook;
+    Spell spell{&owner, {}};spell.info.Id=804020;stormbringer_sphere_hits hook;
     nextRoll=25;hook.OnSpellHitResult(&spell,&target,0,100,0,false);assert(!FindSphere(&owner));
     nextRoll=0;hook.OnSpellHitResult(&spell,&target,1,100,0,false);assert(rolls==1);
     hook.OnSpellHitResult(&spell,&target,0,0,0,false);assert(!FindSphere(&owner));
