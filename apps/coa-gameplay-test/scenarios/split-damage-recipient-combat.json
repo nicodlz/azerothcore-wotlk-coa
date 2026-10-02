@@ -12,25 +12,25 @@
       "spell_hit_rating": 10000
     },
     {
-      "id": "unlinkedRecipient",
+      "id": "unlinked_recipient",
       "race": 1,
       "class": 2,
       "level": 80
     },
     {
-      "id": "unlinkedProtected",
+      "id": "unlinked_protected",
       "race": 1,
       "class": 1,
       "level": 80
     },
     {
-      "id": "linkedRecipient",
+      "id": "linked_recipient",
       "race": 1,
       "class": 2,
       "level": 80
     },
     {
-      "id": "linkedProtected",
+      "id": "linked_protected",
       "race": 1,
       "class": 1,
       "level": 80
@@ -54,57 +54,57 @@
     },
     {
       "action": "pvp",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "enabled": true
     },
     {
       "action": "assert",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "combat",
       "equals": 0
     },
     {
       "action": "pvp",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "enabled": true
     },
     {
       "action": "assert",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "combat",
       "equals": 0
     },
     {
       "action": "pvp",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "enabled": true
     },
     {
       "action": "assert",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "combat",
       "equals": 0
     },
     {
       "action": "pvp",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "enabled": true
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "combat",
       "equals": 0
     },
     {
       "action": "group",
-      "actor": "unlinkedRecipient",
-      "target": "unlinkedProtected"
+      "actor": "unlinked_recipient",
+      "target": "unlinked_protected"
     },
     {
       "action": "group",
-      "actor": "linkedRecipient",
-      "target": "linkedProtected"
+      "actor": "linked_recipient",
+      "target": "linked_protected"
     },
     {
       "action": "learn",
@@ -113,75 +113,75 @@
     },
     {
       "action": "learn",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "spell": 6940
     },
     {
       "action": "snapshot",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "max_health",
-      "save_as": "unlinkedRecipientMax"
+      "save_as": "unlinked_recipient_max"
     },
     {
       "action": "snapshot",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "max_health",
-      "save_as": "unlinkedProtectedMax"
+      "save_as": "unlinked_protected_max"
     },
     {
       "action": "snapshot",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "max_health",
-      "save_as": "linkedRecipientMax"
+      "save_as": "linked_recipient_max"
     },
     {
       "action": "snapshot",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "max_health",
-      "save_as": "linkedProtectedMax"
+      "save_as": "linked_protected_max"
     },
     {
       "action": "snapshot",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "health",
-      "save_as": "unlinkedRecipientHealth"
+      "save_as": "unlinked_recipient_health"
     },
     {
       "action": "snapshot",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "health",
-      "save_as": "unlinkedProtectedHealth"
+      "save_as": "unlinked_protected_health"
     },
     {
       "action": "cast",
       "actor": "attacker",
       "spell": 2136,
-      "target": "unlinkedProtected"
+      "target": "unlinked_protected"
     },
     {
       "action": "assert",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "health",
-      "relative_to": "unlinkedProtectedHealth",
+      "relative_to": "unlinked_protected_health",
       "max": -1,
       "within_ms": 3000
     },
     {
       "action": "assert",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "combat",
       "equals": 1
     },
     {
       "action": "assert",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "health",
-      "relative_to": "unlinkedRecipientHealth",
+      "relative_to": "unlinked_recipient_health",
       "equals": 0
     },
     {
       "action": "assert",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "combat",
       "equals": 0
     },
@@ -191,22 +191,22 @@
     },
     {
       "action": "cast",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "spell": 6940,
-      "target": "linkedProtected"
+      "target": "linked_protected"
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "aura",
       "spell": 6940,
-      "caster": "linkedRecipient",
+      "caster": "linked_recipient",
       "equals": 1,
       "within_ms": 2000
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "aura_amount",
       "spell": 6940,
       "effect": 0,
@@ -214,83 +214,83 @@
     },
     {
       "action": "assert",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "combat",
       "equals": 0
     },
     {
       "action": "snapshot",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "health",
-      "save_as": "linkedRecipientHealth"
+      "save_as": "linked_recipient_health"
     },
     {
       "action": "snapshot",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "health",
-      "save_as": "linkedProtectedHealth"
+      "save_as": "linked_protected_health"
     },
     {
       "action": "cast",
       "actor": "attacker",
       "spell": 2136,
-      "target": "linkedProtected"
+      "target": "linked_protected"
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "health",
-      "relative_to": "linkedProtectedHealth",
+      "relative_to": "linked_protected_health",
       "max": -1,
       "within_ms": 3000
     },
     {
       "action": "assert",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "health",
-      "relative_to": "linkedRecipientHealth",
+      "relative_to": "linked_recipient_health",
       "max": -1,
       "within_ms": 1000
     },
     {
       "action": "assert",
       "label": "Hostile redirected damage engages its actual recipient",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "combat",
       "equals": 1
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "combat",
       "equals": 1
     },
     {
       "action": "assert",
-      "actor": "unlinkedRecipient",
+      "actor": "unlinked_recipient",
       "metric": "max_health",
-      "relative_to": "unlinkedRecipientMax",
+      "relative_to": "unlinked_recipient_max",
       "equals": 0
     },
     {
       "action": "assert",
-      "actor": "unlinkedProtected",
+      "actor": "unlinked_protected",
       "metric": "max_health",
-      "relative_to": "unlinkedProtectedMax",
+      "relative_to": "unlinked_protected_max",
       "equals": 0
     },
     {
       "action": "assert",
-      "actor": "linkedRecipient",
+      "actor": "linked_recipient",
       "metric": "max_health",
-      "relative_to": "linkedRecipientMax",
+      "relative_to": "linked_recipient_max",
       "equals": 0
     },
     {
       "action": "assert",
-      "actor": "linkedProtected",
+      "actor": "linked_protected",
       "metric": "max_health",
-      "relative_to": "linkedProtectedMax",
+      "relative_to": "linked_protected_max",
       "equals": 0
     }
   ]
