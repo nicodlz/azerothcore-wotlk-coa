@@ -78,6 +78,7 @@ namespace
 
     std::mutex g_accountLock;
     std::unordered_map<ObjectGuid::LowType, uint32> g_otherCharactersPrestige;
+    std::vector<ActivationResetHandler> g_activationResetHandlers;
 
     std::vector<RewardItem> Rewards()
     {
@@ -536,6 +537,8 @@ namespace
         MailItems(player, mailed, trans);
         player->SaveToDB(trans, false, false);
         CharacterDatabase.CommitTransaction(trans);
+        for (ActivationResetHandler handler : g_activationResetHandlers)
+            handler(player);
 
         SendPrestigeLevels(player);
         chat.PSendSysMessage("Chromie winds back time. Prestige {}: reach level {} again to unlock your "
@@ -791,6 +794,12 @@ public:
 
 namespace CoAPrestige
 {
+    void AddActivationResetHandler(ActivationResetHandler handler)
+    {
+        if (handler)
+            g_activationResetHandlers.push_back(handler);
+    }
+
     bool IsActive(Player* player)
     {
         return player && player->HasAura(PrestigedAura) && player->GetLevel() < g_requiredLevel;

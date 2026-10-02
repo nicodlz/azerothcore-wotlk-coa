@@ -6,7 +6,6 @@
 #include "Random.h"
 #include "AllCreatureScript.h"
 
-
 using namespace Acore::ChatCommands;
 
 namespace CoAChallenges
@@ -3818,6 +3817,7 @@ namespace CoAChallenges
 void Addmod_coa_challengesScripts()
 {
     RegisterAscensionClientConfig(&CoAChallenges::AppendClientConfig);
+    CoAPrestige::AddActivationResetHandler(&CoAChallenges::ResetEligibilityForPrestige);
     new CoAChallenges::CoAChallengesPlayer();
     new CoAChallenges::CoAChallengesWorld();
     new CoAChallenges::CoAChallengesServer();
@@ -3830,4 +3830,3 @@ void Addmod_coa_challengesScripts()
     new CoAChallenges::CoAChallengesSpells();
     new CoAChallenges::CoAChallengesAllCreature();
 }
-

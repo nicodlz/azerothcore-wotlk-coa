@@ -515,6 +515,7 @@ void SetConditionFlag(uint32 guid, char const* flag);
 bool HasConditionFlag(uint32 guid, char const* flag);
 void ClearConditionFlag(uint32 guid, std::string const& flag);
 void ResetConditionFlags(uint32 guid);
+void ResetEligibilityForPrestige(Player* player);
 void ForgetConditionFlags(uint32 guid);
 uint32 FreeInventorySlots(Player* player);
 std::vector<ConditionState> EvaluateConditions(Player* player, uint32 challengeID);

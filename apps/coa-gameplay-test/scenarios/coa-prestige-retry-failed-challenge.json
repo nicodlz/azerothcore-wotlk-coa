@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "name": "Prestige permits a new Hardcore attempt after failure (#6083)",
+  "contract": "Hardcore trial 54 has one life, aura 92989 and clean-start level/loot conditions in effective SQL. A native death fails its first run and reactivation is refused during that lifetime. Chromie prestige starts a new level-one lifetime; the maintainer confirmed restriction flags must reset (#6083). A normal challenge activation must therefore succeed after prestige and apply Hardcore aura 92989. This regression keeps the same-lifetime failure restriction enabled. The class 20 Fleshweaver specialization 25 is selected only after reaching 60: ChrSpecs 25 identifies advancement 9905, whose native acquisition loader applies the level 10 identity gate even though its raw RequiredLevel is 0. The fixture resurrects through the console revive command; socketless fixture accounts have ordinary player security, so a player .revive command is not permitted. This setup action does not reset challenge state. A second character loots a sack before prestige, is refused Slow and Steady trial 601 with code 8, then can activate that trial after prestige. This covers the condition cache and failure-independent eligibility.",
+  "timeout_ms": 90000,
+  "location": {
+    "map": 0,
+    "x": -8816.5,
+    "y": 627.0,
+    "z": 94.1,
+    "o": 3.8
+  },
+  "players": [
+    {
+      "id": "prestiger",
+      "race": 1,
+      "class": 20,
+      "level": 1
+    },
+    {
+      "id": "looter",
+      "race": 1,
+      "class": 20,
+      "level": 1
+    }
+  ],
+  "creatures": [
+    {
+      "id": "chromie",
+      "owner": "prestiger",
+      "entry": 178081,
+      "distance": 2,
+      "faction": 35
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "start_challenge",
+      "actor": "prestiger",
+      "challenge": 54,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Hardcore starts on a fresh character",
+      "actor": "prestiger",
+      "metric": "challenge_start_code",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "actor": "prestiger",
+      "metric": "aura",
+      "spell": 92989,
+      "equals": 1
+    },
+    {
+      "action": "die",
+      "actor": "prestiger"
+    },
+    {
+      "action": "wait",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "label": "Hardcore death removes its active aura",
+      "actor": "prestiger",
+      "metric": "aura",
+      "spell": 92989,
+      "equals": 0
+    },
+    {
+      "action": "console",
+      "label": "Resurrect the fixture after its failed run",
+      "command": "revive Harnessa"
+    },
+    {
+      "action": "assert",
+      "actor": "prestiger",
+      "metric": "alive",
+      "equals": 1,
+      "within_ms": 3000
+    },
+    {
+      "action": "start_challenge",
+      "actor": "prestiger",
+      "challenge": 54,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Failure blocks another attempt within the same lifetime",
+      "actor": "prestiger",
+      "metric": "challenge_start_code",
+      "equals": 12
+    },
+    {
+      "action": "set_level",
+      "actor": "prestiger",
+      "value": 60
+    },
+    {
+      "action": "specialization",
+      "actor": "prestiger",
+      "id": 25
+    },
+    {
+      "action": "gossip_hello",
+      "actor": "prestiger",
+      "target": "chromie"
+    },
+    {
+      "action": "gossip_select",
+      "actor": "prestiger",
+      "option": 0
+    },
+    {
+      "action": "assert",
+      "actor": "prestiger",
+      "metric": "level",
+      "equals": 1,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "prestiger",
+      "metric": "aura",
+      "spell": 9930831,
+      "equals": 1
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "start_challenge",
+      "actor": "prestiger",
+      "challenge": 54,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Prestige permits a fresh Hardcore attempt after failure",
+      "actor": "prestiger",
+      "metric": "challenge_start_code",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "The fresh attempt grants the actual Hardcore aura",
+      "actor": "prestiger",
+      "metric": "aura",
+      "spell": 92989,
+      "equals": 1
+    },
+    {
+      "action": "add_item",
+      "actor": "looter",
+      "item": 5335
+    },
+    {
+      "action": "open_item",
+      "actor": "looter",
+      "item": 5335
+    },
+    {
+      "action": "collect_loot",
+      "actor": "looter"
+    },
+    {
+      "action": "assert",
+      "actor": "looter",
+      "metric": "loot_received",
+      "equals": 1
+    },
+    {
+      "action": "close_loot",
+      "actor": "looter"
+    },
+    {
+      "action": "start_challenge",
+      "actor": "looter",
+      "challenge": 601,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Prior loot blocks a clean-start trial before prestige",
+      "actor": "looter",
+      "metric": "challenge_start_code",
+      "equals": 8
+    },
+    {
+      "action": "set_level",
+      "actor": "looter",
+      "value": 60
+    },
+    {
+      "action": "specialization",
+      "actor": "looter",
+      "id": 25
+    },
+    {
+      "action": "gossip_hello",
+      "actor": "looter",
+      "target": "chromie"
+    },
+    {
+      "action": "gossip_select",
+      "actor": "looter",
+      "option": 0
+    },
+    {
+      "action": "assert",
+      "actor": "looter",
+      "metric": "level",
+      "equals": 1,
+      "within_ms": 5000
+    },
+    {
+      "action": "assert",
+      "actor": "looter",
+      "metric": "aura",
+      "spell": 9930831,
+      "equals": 1
+    },
+    {
+      "action": "wait",
+      "ms": 5000
+    },
+    {
+      "action": "start_challenge",
+      "actor": "looter",
+      "challenge": 601,
+      "level": 1
+    },
+    {
+      "action": "wait",
+      "ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Prestige also clears the old lifetime loot restriction",
+      "actor": "looter",
+      "metric": "challenge_start_code",
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "The fresh clean-start trial applies its real aura",
+      "actor": "looter",
+      "metric": "aura",
+      "spell": 200755,
+      "equals": 1,
+      "within_ms": 3000
+    }
+  ]
+}

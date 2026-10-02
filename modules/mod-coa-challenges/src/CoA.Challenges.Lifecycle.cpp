@@ -888,10 +888,6 @@ namespace CoAChallenges
     // "broken" (blocking activation) when the player violates it. Loot/level
     // flags persist per character; group/inventory are checked live.
 
-    // Condition flags are cached per character and written through. The
-    // INSERT is asynchronous, so reading the table back could miss a flag an
-    // earlier hook just set (loot, then start a trial before the queue drains);
-    // the cache is the authority once a character's rows have been loaded.
     namespace
     {
         std::mutex ConditionFlagMutex;
@@ -914,27 +910,38 @@ namespace CoAChallenges
     void SetConditionFlag(uint32 guid, char const* flag)
     {
         std::string eflag = flag ? flag : "";
-        {
-            std::lock_guard<std::mutex> lock(ConditionFlagMutex);
-            if (!LoadedConditionFlags(guid).insert(eflag).second)
-                return;
-        }
+        std::lock_guard<std::mutex> lock(ConditionFlagMutex);
+        if (!LoadedConditionFlags(guid).insert(eflag).second)
+            return;
         CharacterDatabase.EscapeString(eflag);
-        CharacterDatabase.Execute(
+        CharacterDatabase.DirectExecute(
             "INSERT IGNORE INTO coa_character_condition (guid, flag) VALUES ({}, '{}')",
             guid, eflag);
     }
 
     void ClearConditionFlag(uint32 guid, std::string const& flag)
     {
-        {
-            std::lock_guard<std::mutex> lock(ConditionFlagMutex);
-            LoadedConditionFlags(guid).erase(flag);
-        }
+        std::lock_guard<std::mutex> lock(ConditionFlagMutex);
+        LoadedConditionFlags(guid).erase(flag);
         std::string eflag = flag;
         CharacterDatabase.EscapeString(eflag);
-        CharacterDatabase.Execute(
+        CharacterDatabase.DirectExecute(
             "DELETE FROM coa_character_condition WHERE guid = {} AND flag = '{}'", guid, eflag);
+    }
+
+    void ResetEligibilityForPrestige(Player* player)
+    {
+        uint32 const guid = player->GetGUID().GetCounter();
+        {
+            std::lock_guard<std::mutex> lock(ConditionFlagMutex);
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            trans->Append("DELETE FROM coa_challenge_failure WHERE guid = {}", guid);
+            trans->Append("DELETE FROM coa_character_condition WHERE guid = {}", guid);
+            CharacterDatabase.DirectCommitTransaction(trans);
+            ConditionFlagCache[guid].clear();
+        }
+        SendFailureList(player);
+        SendCriteriaState(player);
     }
 
     // The character's rows were deleted: it has no flags from now on.

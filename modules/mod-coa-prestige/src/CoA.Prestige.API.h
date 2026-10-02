@@ -15,6 +15,9 @@ class Player;
 
 namespace CoAPrestige
 {
+    using ActivationResetHandler = void (*)(Player*);
+    void AddActivationResetHandler(ActivationResetHandler handler);
+
     // Aura the client treats as "prestiged" (C_Player:IsPrestiged()).
     constexpr uint32 PRESTIGE_AURA = 9930831;
 
