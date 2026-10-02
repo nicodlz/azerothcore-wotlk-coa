@@ -7,6 +7,6 @@
     "who-hides-bots": "The Who list is process-global and would list players of other running cases",
     "who-lists-bots": "The Who list is process-global and would list players of other running cases",
     "wildcard-season-event": "Stops the process-global Wildcard season event whose spawns and board quests other cases use",
-    "player-limit-config-reload": "Seeds and restores the process-global session player cap and reloads world configuration"
+    "player-limit-config-reload": "Reloads world config and changes the shared session cap"
   }
 }
