@@ -668,9 +668,9 @@ def validate(scenario):
                           'wildcard_roll_cards_used', 'wildcard_bonus_pack_progress'} | PLAYER_STAT_METRICS:
                 require(step['actor'] in player_ids, f'{where}: metric needs a player')
             if metric == 'gameobject_loot_item_count_mismatches':
-                number(step.get('entry'), f'{where}.entry', 1, integer=True)
-                number(step.get('item'), f'{where}.item', 1, integer=True)
-                number(step.get('count'), f'{where}.count', 0, integer=True)
+                number(step.get('entry'), f'{where}.entry', 1, 0xffffffff, integer=True)
+                number(step.get('item'), f'{where}.item', 1, 0xffffffff, integer=True)
+                number(step.get('count'), f'{where}.count', 0, 0xffffffff, integer=True)
                 number(step.get('rolls', 256), f'{where}.rolls', 1, 10000, integer=True)
             shape = (metric, step.get('exclude'))
             if 'relative_to' in step:
