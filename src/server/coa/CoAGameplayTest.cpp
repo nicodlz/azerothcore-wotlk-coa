@@ -1686,6 +1686,8 @@ private:
             Require(hand < MAX_ATTACK, "Invalid attack hand");
             return unit->GetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + hand);
         }
+        if (metric == "player_controlled")
+            return unit->IsControlledByPlayer();
         if (metric == "run_speed")
             return unit->GetSpeed(MOVE_RUN);
         if (metric == "run_speed_config_rate")

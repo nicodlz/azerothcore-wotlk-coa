@@ -14,10 +14,24 @@
     {
       "id": "npc",
       "entry": 36,
-      "reaction": "passive"
+      "reaction": 0,
+      "owner": "player",
+      "faction": 35
     }
   ],
   "steps": [
+    {
+      "action": "assert",
+      "actor": "player",
+      "metric": "player_controlled",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "npc",
+      "metric": "player_controlled",
+      "equals": 0
+    },
     {
       "action": "snapshot",
       "actor": "player",
