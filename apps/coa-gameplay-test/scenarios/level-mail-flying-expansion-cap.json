@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Flying training level mail respects the session expansion cap for both factions",
-  "contract": "Expansion=0 disables expansion content according to worldserver.conf.dist. WorldSocket account loading clamps each real session to CONFIG_EXPANSION. The fixture expansion field follows that native cap. Effective stock mail_level_reward rows send template 283 from Hargen Bronzewing (35100) to Alliance race mask 1101 and template 282 from Wind Rider Jahubo (35093) to Horde race mask 690 at level 60. Installed MailTemplate.dbc explicitly invites the player to Honor Hold or Thrallmar in Hellfire Peninsula; both sender creatures spawn on Outland map 530, which requires The Burning Crusade. A vanilla session must receive neither invitation, while TBC and WotLK sessions must receive their faction invitation. All six sessions must still receive the ordinary ground-riding invitation at level 20. The test waits after each level transition before asserting absence, and snapshots after level-59 fixture mail has settled. It tests native level-up mail acquisition and delivery, not client rendering.",
+  "contract": "Vanilla level-60 mail offers ground riding, while Outland flying requires the TBC expansion.",
   "timeout_ms": 120000,
   "location": {
     "map": 0,
