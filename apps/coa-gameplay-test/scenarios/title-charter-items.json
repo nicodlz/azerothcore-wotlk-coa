@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Title charters grant their promised titles once without wasting duplicates",
-  "contract": "Item tooltips promise Founder for 977020 and legacy 134988, Bloody for 977220, and The Godslayer for 1777010. CharTitles.dbc names those titles at ids 210, 230 and 180. Using a charter grants the matching title and consumes one item. An already-earned title leaves its duplicate charter available.",
+  "contract": "Each charter grants its promised title; duplicate use preserves the item.",
   "timeout_ms": 30000,
   "players": [
     {
