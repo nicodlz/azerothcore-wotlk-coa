@@ -36,6 +36,8 @@
 #include "LootMgr.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "MotionMaster.h"
+#include "MoveSpline.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -1506,7 +1508,14 @@ private:
                 Player* player = GetPlayer(owner);
                 Position position = player->GetPosition();
                 position.m_positionX += definition.get<float>("distance", 3);
-                TempSummon* creature = player->SummonCreature(definition.get<uint32>("entry"), position);
+                SummonPropertiesEntry const* properties = nullptr;
+                if (auto const propertyId = definition.get_optional<uint32>("summon_properties"))
+                {
+                    properties = sSummonPropertiesStore.LookupEntry(*propertyId);
+                    Require(properties != nullptr, "Unknown fixture summon properties");
+                }
+                TempSummon* creature = player->SummonCreature(definition.get<uint32>("entry"), position,
+                    TEMPSUMMON_MANUAL_DESPAWN, 0, 0, properties);
                 Require(creature != nullptr, "Could not summon fixture creature: " + id);
                 _targets.emplace(id, Target{ creature->GetMapId(), creature->GetInstanceId(), creature->GetGUID() });
                 creature->SetPhaseMask(_phase, true);
@@ -1588,6 +1597,16 @@ private:
             return unit->IsNonMeleeSpellCast(false);
         if (metric == "moving")
             return unit->isMoving();
+        if (metric == "spline_active")
+            return !unit->movespline->Finalized();
+        if (metric == "spline_velocity")
+            return double(unit->movespline->Velocity());
+        if (metric == "run_speed")
+            return double(unit->GetSpeed(MOVE_RUN));
+        if (metric == "guardian")
+            return unit->IsGuardian();
+        if (metric == "controllable_guardian")
+            return unit->IsControllableGuardian();
         if (metric == "water_walk")
             return unit->HasWaterWalkAura();
         if (metric == "forced_forward")
@@ -3157,6 +3176,24 @@ private:
             SpellCastResult result = creature->CastSpell(target, spell, TRIGGERED_FULL_MASK);
             record.put("cast_result", uint32(result));
             Require(result == SPELL_CAST_OK, "Creature cast failed: " + std::to_string(result));
+            return;
+        }
+        if (action == "follow")
+        {
+            Unit* follower = GetUnit(id);
+            Unit* target = GetUnit(step.get<std::string>("target"));
+            Require(follower->IsCreature() && follower->GetCharmerOrOwnerGUID() == target->GetGUID(),
+                "Follow fixture needs an owned creature and its owner");
+            follower->GetMotionMaster()->Clear();
+            follower->StopMoving();
+            follower->NearTeleportTo(target->GetPositionX() + step.get<float>("distance"),
+                target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
+            follower->GetMotionMaster()->MoveFollow(target, 1.0f, 0.0f);
+            return;
+        }
+        if (action == "set_run_speed")
+        {
+            GetUnit(id)->SetSpeed(MOVE_RUN, step.get<float>("rate"));
             return;
         }
         Player* player = GetPlayer(id);

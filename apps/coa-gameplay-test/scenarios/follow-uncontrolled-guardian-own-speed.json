@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "name": "Follow movement: uncontrolled guardian keeps its own spline speed",
+  "contract": "Upstream #27719 distinguishes guardians without pet bars from controllable guardians. Authentic SummonProperties 1021 creates the Mirror Image guardian without the controllable flag; assertions verify that classification. With its own native run speed 7 yd/s and owner fixture run speed 14 yd/s, a recall from 40 yd must launch an active native follow spline at 7 yd/s. Before the fix it inherits and boosts owner speed. Fixture SetSpeed replaces actual mounting and MotionMaster::MoveFollow replaces a pet-bar request; this tests native movement execution, not summon-spell acquisition, client animation, mounted speed effects or completed travel.",
+  "timeout_ms": 90000,
+  "players": [
+    {
+      "id": "owner",
+      "race": 1,
+      "class": 8,
+      "level": 80
+    }
+  ],
+  "creatures": [
+    {
+      "id": "image",
+      "owner": "owner",
+      "entry": 31216,
+      "summon_properties": 1021,
+      "faction": 35,
+      "distance": 3
+    }
+  ],
+  "steps": [
+    {
+      "action": "wait",
+      "ms": 3000
+    },
+    {
+      "action": "assert",
+      "actor": "image",
+      "metric": "guardian",
+      "equals": 1
+    },
+    {
+      "action": "assert",
+      "actor": "image",
+      "metric": "controllable_guardian",
+      "equals": 0
+    },
+    {
+      "action": "set_run_speed",
+      "actor": "owner",
+      "rate": 2
+    },
+    {
+      "action": "assert",
+      "actor": "owner",
+      "metric": "run_speed",
+      "equals": 14
+    },
+    {
+      "action": "set_run_speed",
+      "actor": "image",
+      "rate": 1
+    },
+    {
+      "action": "assert",
+      "actor": "image",
+      "metric": "run_speed",
+      "equals": 7
+    },
+    {
+      "action": "follow",
+      "actor": "image",
+      "target": "owner",
+      "distance": 40
+    },
+    {
+      "action": "assert",
+      "actor": "image",
+      "metric": "spline_active",
+      "equals": 1,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "actor": "image",
+      "metric": "spline_velocity",
+      "min": 6.99,
+      "max": 7.01
+    }
+  ]
+}

@@ -31,6 +31,7 @@ HOURS_PER_DAY = 24
 MINUTES_PER_HOUR = 60
 MINUTES_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR
 METRICS = {
+    'spline_active', 'spline_velocity', 'run_speed', 'guardian', 'controllable_guardian',
     'moving', 'water_walk', 'forced_forward', 'distance_2d', 'cast_remaining_ms', 'cast_pushback_ms',
     'melee_damage_count', 'melee_damage_total',
     'pet_power', 'pet_max_power', 'spell_energize_count', 'spell_energize_total',
@@ -117,6 +118,8 @@ METRIC_FIELDS = {'actor', 'metric', 'spell', 'power', 'caster', 'effect', 'item'
                  'min_distance', 'owner_display', 'skill', 'cache', 'table', 'exclude', 'dungeon', 'source',
                  'opcode', 'from', 'slot', 'achievement', 'title'}
 ACTIONS = {
+    'follow': ({'actor', 'target', 'distance'}, {'actor', 'target', 'distance'}),
+    'set_run_speed': ({'actor', 'rate'}, {'actor', 'rate'}),
     'stop_attack': ({'actor'}, {'actor'}),
     'set_moving': ({'actor', 'enabled'}, {'actor', 'enabled'}),
     'level_scaling_packet': ({'actor', 'value'}, {'actor', 'value'}),
@@ -271,7 +274,7 @@ def validate(scenario):
         require(type(player.get('allow_regeneration', True)) is bool, 'allow_regeneration must be boolean')
     for creature in creatures:
         keys(creature, {'id', 'owner', 'entry'},
-             {'id', 'owner', 'entry', 'distance', 'faction', 'level', 'health', 'reaction'}, 'creature')
+             {'id', 'owner', 'entry', 'distance', 'faction', 'level', 'health', 'reaction', 'summon_properties'}, 'creature')
         identity = creature['id']
         require(isinstance(identity, str) and ACTOR_ID.fullmatch(identity), 'Invalid creature id')
         require(identity not in actor_ids, 'Duplicate actor id')
@@ -282,6 +285,8 @@ def validate(scenario):
         number(creature.get('level', 80), 'creature level', 1, 255, True)
         number(creature.get('distance', 3), 'distance', 0, 100)
         number(creature.get('reaction', 0), 'reaction', 0, 2, True)
+        if 'summon_properties' in creature:
+            number(creature['summon_properties'], 'summon_properties', 1, 2**31 - 1, True)
     if 'location' in scenario:
         location = scenario['location']
         keys(location, {'map', 'x', 'y', 'z'}, {'map', 'x', 'y', 'z', 'o', 'ignore_access'}, 'location')
@@ -300,6 +305,12 @@ def validate(scenario):
         action = step['action']
         required, allowed = ACTIONS[action]
         keys(step, required | {'action'}, allowed | {'action', 'label'}, where)
+        if action == 'follow':
+            require(step['actor'] not in player_ids and step['target'] in player_ids,
+                    f'{where}: follow needs a creature and a player target')
+            number(step['distance'], f'{where}.distance', 3, 100)
+        if action == 'set_run_speed':
+            number(step['rate'], f'{where}.rate', 0.1, 10)
         if action in {'console', 'command'}:
             require(isinstance(step['command'], str) and step['command'].strip()
                     and '\n' not in step['command'] and '\r' not in step['command'],
@@ -315,7 +326,7 @@ def validate(scenario):
                 number(step['language'], f'{where}.language', 0, 2**32 - 1, True)
         if 'actor' in step:
             require(step['actor'] in actor_ids, f'{where}: unknown actor')
-            require(action in {'snapshot', 'assert', 'set_health', 'cast', 'attack_owned_creature'}
+            require(action in {'snapshot', 'assert', 'set_health', 'cast', 'attack_owned_creature', 'follow', 'set_run_speed'}
                     or step['actor'] in player_ids,
                     f'{where}: action needs a player')
             if action == 'cast' and step['actor'] not in player_ids:
